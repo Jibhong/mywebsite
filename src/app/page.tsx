@@ -26,7 +26,7 @@ export default function Home() {
         </div>
 
         <div className="mt-8 text-2xl sm:text-3xl font-bold text-gray-600 text-center">
-          Hello, I'm
+          {"Hello, I'm"}
         </div>
         <div className="mt-2 text-4xl sm:text-4xl font-bold text-gray-800 text-center">
           PISIT
@@ -34,7 +34,7 @@ export default function Home() {
         </div>
 
         <p className="mt-4 text-center text-gray-700 max-w-xl text-lg sm:text-xl">
-          I’m a self-taught developer and creative enthusiast. I love coding, 3D modeling, VFX, and exploring new technologies.
+          {"I'm a self-taught developer and creative enthusiast. I love coding, 3D modeling, VFX, and exploring new technologies."}
         </p>
       
         <div className="mt-6 flex space-x-4">
