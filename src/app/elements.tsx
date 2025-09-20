@@ -47,9 +47,9 @@ export function Footer() {
       <div className="max-w-6xl mx-auto py-6 px-4 sm:px-6 flex flex-col sm:flex-row justify-between items-center">
         <p className="text-sm">&copy; 2025-{new Date().getFullYear()} PISIT APIRATWARAKUL. All rights reserved.</p>
         <div className="flex space-x-4 mt-2 sm:mt-0">
-          <a href="https://github.com/TagoPW" className="hover:text-gray-300 transition">GitHub</a>
-          <a href="https://linkedin.com/in/TagoPW" className="hover:text-gray-300 transition">LinkedIn</a>
-          <a href="mailto:your@email.com" className="hover:text-gray-300 transition">Email</a>
+          <a href="https://github.com/Jibhong" className="hover:text-gray-300 transition">GitHub</a>
+          <a href="https://linkedin.com/in/Jibhong" className="hover:text-gray-300 transition">LinkedIn</a>
+          <a href="mailto:jibhongsup@gmail.com" className="hover:text-gray-300 transition">Email</a>
         </div>
       </div>
     </footer>
