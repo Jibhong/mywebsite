@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { Header, Footer, SearchBar } from "./elements";
-import { RepoGrid } from "./card";
 import { useEffect, useState } from "react";
 
 
