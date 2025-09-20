@@ -56,8 +56,11 @@ export function Footer() {
   );
 }
 
+type SearchBarProps = {
+  onSearch: (query: string) => void;
+};
 
-export function SearchBar() {
+export function SearchBar({ onSearch }: SearchBarProps) {
   const [query, setQuery] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
