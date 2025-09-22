@@ -4,24 +4,41 @@ import Image from "next/image";
 import { Header, Footer, SearchBar } from "./elements";
 import { useEffect, useState } from "react";
 
+const BLOB  = process.env.NEXT_PUBLIC_VERCEL_BLOB_URL;
 
+interface Card {
+  title: string;
+  description: string;
+  path: string;
+  thumbnail: string;
+}
 
 export default function Home() {
-
   const handleSearch = (query: string) => {
     console.log("Searching for:", query);
     // Add your search logic here
   };
+
+  const [cards, setCards] = useState<Card[]>([]);
+
+
   useEffect(() => {
     async function fetchCards() {
       const res = await fetch(
-        "https://dcet4rnv2wp0nxq3.public.blob.vercel-storage.com/blog_pages/index.json"
+        BLOB+"/blog_pages/index.json"
       );
       const card_list = await res.json();
       console.log(card_list);
+      let tempCards : any[] = [];
       for(let i=0; i<Math.min(6,card_list.length); i++){
         console.log(i);
-    }
+        const res = await fetch(BLOB+"/blog_pages/"+card_list[i]+"/card.json");
+        const card = await res.json(); 
+        console.log(card);      
+        tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp" }); // append multiple times to temp array
+ 
+      }
+      setCards(tempCards);
     }
     fetchCards();
   }, []);
@@ -75,145 +92,28 @@ export default function Home() {
       </div>
       <SearchBar onSearch={handleSearch} />
 
-      <div className="px-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition">
-          
-
-          <h2 className="text-xl font-bold mb-2 text-gray-700">My GitHub Repo</h2>
+      <div id="card_container" className="px-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        {cards.map((data,index) => (
+        <div key={index} className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition">
+          <h2 className="text-xl font-bold mb-2 text-gray-700">{data.title}</h2>
           <p className="text-gray-700 mb-2">
-            Repo description goes here. You can add stars, forks, and latest commits info.
+            {data.description}
           </p>
           <a 
-            href="https://github.com/Jibhong/mywebsite" 
+            href={"https://github.com/Jibhong"}
             className="text-gray-500 hover:underline font-medium mb-2 block"
           >
             View Page
           </a>
-
           <Image 
-            src="/profile.png" 
+            src={data.thumbnail}
             alt="Repo image" 
             width={400} 
             height={192} 
             className="w-full h-48 object-cover rounded-2xl"
           />
-          
         </div>
-        <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition">
-          
-
-          <h2 className="text-xl font-bold mb-2 text-gray-700">My GitHub Repo</h2>
-          <p className="text-gray-700 mb-2">
-            Repo description goes here. You can add stars, forks, and latest commits info.
-          </p>
-          <a 
-            href="https://github.com/Jibhong/mywebsite" 
-            className="text-gray-500 hover:underline font-medium mb-2 block"
-          >
-            View Page
-          </a>
-
-          <Image 
-            src="/profile.png" 
-            alt="Repo image" 
-            width={400} 
-            height={192} 
-            className="w-full h-48 object-cover rounded-2xl"
-          />
-          
-        </div>
-        <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition">
-          
-
-          <h2 className="text-xl font-bold mb-2 text-gray-700">My GitHub Repo</h2>
-          <p className="text-gray-700 mb-2">
-            Repo description goes here. You can add stars, forks, and latest commits info.
-          </p>
-          <a 
-            href="https://github.com/Jibhong/mywebsite" 
-            className="text-gray-500 hover:underline font-medium mb-2 block"
-          >
-            View Page
-          </a>
-
-          <Image 
-            src="/profile.png" 
-            alt="Repo image" 
-            width={400} 
-            height={192} 
-            className="w-full h-48 object-cover rounded-2xl"
-          />
-          
-        </div>
-        <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition">
-          
-
-          <h2 className="text-xl font-bold mb-2 text-gray-700">My GitHub Repo</h2>
-          <p className="text-gray-700 mb-2">
-            Repo description goes here. You can add stars, forks, and latest commits info.
-          </p>
-          <a 
-            href="https://github.com/Jibhong/mywebsite" 
-            className="text-gray-500 hover:underline font-medium mb-2 block"
-          >
-            View Page
-          </a>
-
-          <Image 
-            src="/profile.png" 
-            alt="Repo image" 
-            width={400} 
-            height={192} 
-            className="w-full h-48 object-cover rounded-2xl"
-          />
-          
-        </div>
-        <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition">
-          
-
-          <h2 className="text-xl font-bold mb-2 text-gray-700">My GitHub Repo</h2>
-          <p className="text-gray-700 mb-2">
-            Repo description goes here. You can add stars, forks, and latest commits info.
-          </p>
-          <a 
-            href="https://github.com/Jibhong/mywebsite" 
-            className="text-gray-500 hover:underline font-medium mb-2 block"
-          >
-            View Page
-          </a>
-
-          <Image 
-            src="/profile.png" 
-            alt="Repo image" 
-            width={400} 
-            height={192} 
-            className="w-full h-48 object-cover rounded-2xl"
-          />
-          
-        </div>
-        <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition">
-          
-
-          <h2 className="text-xl font-bold mb-2 text-gray-700">My GitHub Repo</h2>
-          <p className="text-gray-700 mb-2">
-            Repo description goes here. You can add stars, forks, and latest commits info.
-          </p>
-          <a 
-            href="https://github.com/Jibhong/mywebsite" 
-            className="text-gray-500 hover:underline font-medium mb-2 block"
-          >
-            View Page
-          </a>
-
-          <Image 
-            src="/profile.png" 
-            alt="Repo image" 
-            width={400} 
-            height={192} 
-            className="w-full h-48 object-cover rounded-2xl"
-          />
-          
-        </div>
+      ))}
       </div>
       
 
