@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link"
 import { Header, Footer, SearchBar } from "./elements";
 import { useEffect, useState } from "react";
 
@@ -11,6 +12,7 @@ interface Card {
   description: string;
   path: string;
   thumbnail: string;
+  link: string;
 }
 
 export default function Home() {
@@ -35,7 +37,7 @@ export default function Home() {
         const res = await fetch(BLOB+"/blog_pages/"+card_list[i]+"/card.json");
         const card = await res.json(); 
         console.log(card);      
-        tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp" }); // append multiple times to temp array
+        tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp", link: "blog/"+card_list[i]}); // append multiple times to temp array
  
       }
       setCards(tempCards);
@@ -94,17 +96,12 @@ export default function Home() {
 
       <div id="card_container" className="px-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {cards.map((data,index) => (
-        <div key={index} className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition">
+        <Link href={data.link} key={index} className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition">
           <h2 className="text-xl font-bold mb-2 text-gray-700">{data.title}</h2>
           <p className="text-gray-700 mb-2">
             {data.description}
           </p>
-          <a 
-            href={"https://github.com/Jibhong"}
-            className="text-gray-500 hover:underline font-medium mb-2 block"
-          >
-            View Page
-          </a>
+
           <Image 
             src={data.thumbnail}
             alt="Repo image" 
@@ -112,7 +109,7 @@ export default function Home() {
             height={192} 
             className="w-full h-48 object-cover rounded-2xl"
           />
-        </div>
+        </Link>
       ))}
       </div>
       
