@@ -29,7 +29,7 @@ export default function Home() {
       );
       const card_list = await res.json();
       console.log(card_list);
-      let tempCards : any[] = [];
+      const tempCards : Card[] = [];
       for(let i=0; i<Math.min(6,card_list.length); i++){
         console.log(i);
         const res = await fetch(BLOB+"/blog_pages/"+card_list[i]+"/card.json");
