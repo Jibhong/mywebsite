@@ -31,9 +31,9 @@ export function Header() {
           Portfolio
         </h1>
         <nav className="space-x-4 sm:space-x-6">
-          <a href="#about" className="text-gray-700 hover:text-gray-900 transition">About</a>
-          <a href="#projects" className="text-gray-700 hover:text-gray-900 transition">Projects</a>
-          <a href="#contact" className="text-gray-700 hover:text-gray-900 transition">Contact</a>
+          <a href="/" className="text-gray-700 hover:text-gray-900 transition">About</a>
+          <a href="/" className="text-gray-700 hover:text-gray-900 transition">Projects</a>
+          <a href="/" className="text-gray-700 hover:text-gray-900 transition">Contact</a>
         </nav>
       </div>
     </header>

@@ -38,7 +38,7 @@ export default function Home() {
         const card = await res.json(); 
         console.log(card);      
         tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp", link: "blog/"+card_list[i]}); // append multiple times to temp array
- 
+
       }
       setCards(tempCards);
     }
