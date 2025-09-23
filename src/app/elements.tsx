@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link"
 
 
 export function Header() {
@@ -31,9 +32,9 @@ export function Header() {
           Portfolio
         </h1>
         <nav className="space-x-4 sm:space-x-6">
-          <a href="/" className="text-gray-700 hover:text-gray-900 transition">About</a>
-          <a href="/" className="text-gray-700 hover:text-gray-900 transition">Projects</a>
-          <a href="/" className="text-gray-700 hover:text-gray-900 transition">Contact</a>
+          <Link href="/" className="text-gray-700 hover:text-gray-900 transition">About</Link>
+          <Link href="/" className="text-gray-700 hover:text-gray-900 transition">Projects</Link>
+          <Link href="/" className="text-gray-700 hover:text-gray-900 transition">Contact</Link>
         </nav>
       </div>
     </header>
