@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link"
+import { useRouter } from "next/navigation";
+
 
 
 export function Header() {
@@ -33,7 +35,7 @@ export function Header() {
         </h1>
         <nav className="space-x-4 sm:space-x-6">
           <Link href="/" className="text-gray-700 hover:text-gray-900 transition">About</Link>
-          <Link href="/" className="text-gray-700 hover:text-gray-900 transition">Projects</Link>
+          <Link href="/blog" className="text-gray-700 hover:text-gray-900 transition">Projects</Link>
           <Link href="/" className="text-gray-700 hover:text-gray-900 transition">Contact</Link>
         </nav>
       </div>
@@ -61,13 +63,16 @@ type SearchBarProps = {
   onSearch: (query: string) => void;
 };
 
-export function SearchBar({ onSearch }: SearchBarProps) {
+export function SearchBar() {
   const [query, setQuery] = useState("");
+  const router = useRouter();
+
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Searching for:", query);
-  };
+		e.preventDefault();
+		console.log("Searching for:", query);
+    router.push(`/blog?search=${encodeURIComponent(query)}`);
+	};
 
   return (
     <form onSubmit={handleSubmit} className="flex w-full max-w-md mx-auto p-10 pt-5">
@@ -78,7 +83,7 @@ export function SearchBar({ onSearch }: SearchBarProps) {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Find a project..."
-        className="mx-1 flex-1 px-4 py-2 border bg-white border-gray-300 focus outline-none focus:ring-2 focus ring-blue-500 focus transition rounded-xl"
+        className="text-gray-800 mx-1 flex-1 px-4 py-2 border bg-white border-gray-300 focus outline-none focus:ring-2 focus ring-[#502be2ff] focus transition rounded-xl"
       />
       <button
         type="submit"

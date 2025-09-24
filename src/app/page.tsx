@@ -16,10 +16,7 @@ interface Card {
 }
 
 export default function Home() {
-  const handleSearch = (query: string) => {
-    console.log("Searching for:", query);
-    // Add your search logic here
-  };
+  
 
   const [cards, setCards] = useState<Card[]>([]);
 
@@ -92,7 +89,7 @@ export default function Home() {
       <div className=" text-2xl sm:text-3xl font-bold text-gray-600 text-center">
         PROJECTS
       </div>
-      <SearchBar onSearch={handleSearch} />
+      <SearchBar/>
 
       <div id="card_container" className="px-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {cards.map((data,index) => (
