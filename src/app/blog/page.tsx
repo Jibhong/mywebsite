@@ -99,21 +99,23 @@ function HomeContent() {
         </Suspense>
       </div>
         <div className="min-h-screen">
-          <div id="card_container" className="px-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div id="card_container" className="px-10 lg:px-50 grid grid-cols-1 gap-8">
             {cards.length > 0 ? (
               cards.map((data,index) => (
-                <Link href={data.link} key={index} className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition">
-                <h2 className="text-xl font-bold mb-2 text-gray-700">{data.title}</h2>
-                <p className="text-gray-700 mb-2">
-                    {data.description}
-                </p>
+                <Link href={data.link} key={index} className="grid grid-cols-1 sm:grid-cols-2  bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition">
+                <div>
+                  <h2 className="text-3xl font-bold mb-2 text-gray-700">{data.title}</h2>
+                  <p className="text-gray-700 mb-2">
+                      {data.description}
+                  </p>
+                </div>
 
                 <Image 
                     src={data.thumbnail}
                     alt="Repo image" 
                     width={400} 
-                    height={192} 
-                    className="w-full h-48 object-cover rounded-2xl"
+                    height={400} 
+                    className=" w-full h-50 sm:w-50 object-cover rounded-2xl justify-self-end"
                 />
                 </Link>
               ))

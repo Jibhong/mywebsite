@@ -107,8 +107,8 @@ export default function Home() {
             src={data.thumbnail}
             alt="Repo image" 
             width={400} 
-            height={192} 
-            className="w-full h-48 object-cover rounded-2xl"
+            height={400} 
+            className="w-full h-50 object-cover rounded-2xl"
           />
         </Link>
       ))}
