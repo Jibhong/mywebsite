@@ -7,28 +7,28 @@ import { Header, Footer } from "@/app/elements";
 
 export default async function BlogPage({ params: promise_params }: { params: { slug: string } }) {
   const params = await promise_params;
-  // const res = await fetch(`${BLOB}/blog_pages/${params.slug}/content.md`);
-  // if (!res.ok) return notFound();
+  const res = await fetch(`${BLOB}/blog_pages/${params.slug}/content.md`);
+  if (!res.ok) return notFound();
 
-  // const markdown = await res.text();
-  const markdown = `
+  const markdown = await res.text();
+//   const markdown = `
 
-# 👋 Hello, I'm Jibhong
+// # 👋 Hello, I'm Jibhong
 
-I'm a self-taught developer currently studying at Triam Udom Suksa School.
+// I'm a self-taught developer currently studying at Triam Udom Suksa School.
 
-I'm Interested in Competitive Programming, Web Development, AI and Game Development.
+// I'm Interested in Competitive Programming, Web Development, AI and Game Development.
 
-I also do some 3D modeling, and fursuit making as a hobby.
+// I also do some 3D modeling, and fursuit making as a hobby.
 
-## 🌳 My Forest (The Greener The Better)
-
-
-## 💻 Actually Stacking Tech
-![A beautiful sunrise](https://go-skill-icons.vercel.app/api/icons?i=bash,c,c,c,c,c,c,c,c,c,c,cs,cpp,css,tailwindcss,html,javascript,typescript,luau,python")
+// ## 🌳 My Forest (The Greener The Better)
 
 
-`
+// ## 💻 Actually Stacking Tech
+// ![A beautiful sunrise](https://go-skill-icons.vercel.app/api/icons?i=bash,c,c,c,c,c,c,c,c,c,c,cs,cpp,css,tailwindcss,html,javascript,typescript,luau,python")
+
+
+// `
 
   return (
      <div className="pt-30 font-sans bg-gradient-to-br from-blue-200 to-purple-200 min-h-screen flex flex-col">

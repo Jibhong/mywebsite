@@ -1,12 +1,13 @@
 "use client";
 import Fuse from "fuse.js";
 
-
-import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link"
 import { Header, Footer, SearchBar } from "@/app/elements";
 import { useEffect, useState } from "react";
+import { Suspense } from "react";
+
+
 
 const BLOB  = process.env.NEXT_PUBLIC_VERCEL_BLOB_URL;
 
@@ -23,8 +24,6 @@ export default function Home() {
 
   const [cards, setCards] = useState<Card[]>([]);
 	
-	const searchParams = useSearchParams();
-  const searchQuery = searchParams.get("search") || "";
 
   useEffect(() => {
     async function fetchCards() {
@@ -84,7 +83,9 @@ export default function Home() {
         SEARCH PROJECTS
       </div>
       <div className="mb-5">
+        <Suspense fallback={<div>Loading search...</div>}>
           <SearchBar onSearch={refreshSearch}/>
+        </Suspense>
       </div>
         <div className="min-h-screen">
           <div id="card_container" className="px-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">

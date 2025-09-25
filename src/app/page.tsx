@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link"
 import { Header, Footer, SearchBar } from "@/app/elements";
 import { useEffect, useState } from "react";
+import { Suspense } from "react";
+
 
 const BLOB  = process.env.NEXT_PUBLIC_VERCEL_BLOB_URL;
 
@@ -89,7 +91,9 @@ export default function Home() {
       <div className=" text-2xl sm:text-3xl font-bold text-gray-600 text-center">
         PROJECTS
       </div>
-      <SearchBar/>
+      <Suspense fallback={<div>Loading search...</div>}>
+        <SearchBar />
+      </Suspense>
 
       <div id="card_container" className="px-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {cards.map((data,index) => (
