@@ -6,6 +6,8 @@ import Link from "next/link"
 import { Header, Footer, SearchBar } from "@/app/elements";
 import { useEffect, useState } from "react";
 import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+
 
 
 
@@ -19,8 +21,9 @@ interface Card {
   link: string;
 }
 
-export default function Home() {
-  
+function HomeContent() {
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get("search") || "";
 
   const [cards, setCards] = useState<Card[]>([]);
 	
@@ -41,8 +44,16 @@ export default function Home() {
         tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp", link: "blog/"+card_list[i]}); // append multiple times to temp array
 
       }
-      setCards(tempCards);
+      if (searchQuery) {
+        const fuse = new Fuse(tempCards, { keys: ["title", "description"], threshold: 0.3 });
+        const results = fuse.search(searchQuery).map((result) => result.item);
+        setCards(results);
+      } else {
+        setCards(tempCards);
+      }
     }
+
+    
     fetchCards();
   
     
@@ -119,5 +130,14 @@ export default function Home() {
 
 
     </div>
+  );
+}
+
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HomeContent />
+    </Suspense>
   );
 }
