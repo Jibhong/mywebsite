@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link"
-import { Header, Footer, SearchBar } from "./elements";
+import { Header, Footer, SearchBar } from "@/app/elements";
 import { useEffect, useState } from "react";
 
 const BLOB  = process.env.NEXT_PUBLIC_VERCEL_BLOB_URL;
@@ -91,7 +91,7 @@ export default function Home() {
       </div>
       <SearchBar/>
 
-      <div id="card_container" className="px-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div id="card_container" className="px-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {cards.map((data,index) => (
         <Link href={data.link} key={index} className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition">
           <h2 className="text-xl font-bold mb-2 text-gray-700">{data.title}</h2>

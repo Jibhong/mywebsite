@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link"
 import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+
 
 
 
@@ -31,7 +33,7 @@ export function Header() {
     >
       <div className="max-w-6xl mx-auto flex justify-between items-center px-4 sm:px-6">
         <h1 className={`font-bold text-gray-800 text-xl sm:text-2xl transition-all duration-300 ${scrolled ? "text-lg" : "text-2xl"}`}>
-          Portfolio
+          <Link href="/">Portfolio</Link>
         </h1>
         <nav className="space-x-4 sm:space-x-6">
           <Link href="/" className="text-gray-700 hover:text-gray-900 transition">About</Link>
@@ -59,19 +61,26 @@ export function Footer() {
   );
 }
 
-type SearchBarProps = {
-  onSearch: (query: string) => void;
-};
 
-export function SearchBar() {
-  const [query, setQuery] = useState("");
+interface SearchBarProps {
+  onSearch?: (query: string) => void;
+}
+
+export function SearchBar({ onSearch }: SearchBarProps) {
+  const searchParams = useSearchParams();
+  const initialQuery = searchParams.get("search") || "";
+
+
+  const [query, setQuery] = useState(initialQuery);
   const router = useRouter();
+
 
 
   const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		console.log("Searching for:", query);
     router.push(`/blog?search=${encodeURIComponent(query)}`);
+    if(onSearch)onSearch(query);
 	};
 
   return (
