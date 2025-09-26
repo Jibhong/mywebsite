@@ -59,7 +59,7 @@ export default async function BlogPage({ params: promise_params }: { params: { s
         <div className="container max-w-3xl mx-auto p-6 min-h-screen">
 
           <div className="mb-15">
-            <div className="justify-end flex space-x-4 text-gray-600 text-sm">
+            <div className="italic mb-5 text-sm justify-end flex space-x-4 text-gray-600 text-sm">
               {formattedDateTime}
             </div>
             <h1 className="text-4xl font-extrabold text-gray-900 mb-4">

@@ -49,7 +49,7 @@ export function Footer() {
   return (
     <footer className="w-full bg-stone-700 text-white ">
       <div className="max-w-6xl mx-auto py-6 px-4 sm:px-6 flex flex-col sm:flex-row justify-between items-center">
-        <p className="text-sm">&copy; 2025-{new Date().getFullYear()} PISIT APIRATWARAKUL. All rights reserved.</p>
+        <p className="text-sm">&copy; 2025-{new Date().getFullYear()} PISIT APIRATWARAKUL.</p>
         <div className="flex space-x-4 mt-2 sm:mt-0">
           <a href="https://github.com/Jibhong" className="hover:text-gray-300 transition">GitHub</a>
           <a href="https://linkedin.com/in/Jibhong" className="hover:text-gray-300 transition">LinkedIn</a>
@@ -83,7 +83,7 @@ export function SearchBar({ onSearch }: SearchBarProps) {
 	};
 
   return (
-    <form onSubmit={handleSubmit} className="flex w-full max-w-md mx-auto p-10 pt-5">
+    <form onSubmit={handleSubmit} className="flex flex-wrap py-10 items-center justify-center sm:gap-2 px-[5%] max-w-[1000px] w-full max-w-auto mx-auto pt-5">
       {/* <Image src="/search.svg" alt="Search" width={24} height={24} className=""/> */}
       
       <input
@@ -91,7 +91,7 @@ export function SearchBar({ onSearch }: SearchBarProps) {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Find a project..."
-        className="text-gray-800 mx-1 flex-1 px-4 py-2 border bg-white border-gray-300 focus outline-none focus:ring-2 focus ring-orange-300 focus transition rounded-xl"
+        className="my-5 text-gray-800 mx-1 flex-1 px-4 py-2 border bg-white border-gray-300 focus outline-none focus:ring-2 focus ring-orange-300 focus transition rounded-xl"
       />
       <button
         type="submit"

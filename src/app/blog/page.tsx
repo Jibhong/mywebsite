@@ -19,6 +19,7 @@ interface Card {
   path: string;
   thumbnail: string;
   link: string;
+  date: number;
 }
 
 function HomeContent() {
@@ -40,6 +41,15 @@ function HomeContent() {
         console.log(i);
         const res = await fetch(BLOB+"/blog_pages/"+card_list[i]+"/metadata.json");
         const card = await res.json(); 
+
+        const metadata_timestamp = card.date * 1000; // convert to milliseconds
+        const metadata_date = new Date(metadata_timestamp);
+        const formattedDateTime = metadata_date.toLocaleDateString("en-US", {
+          month: "short",
+          day: "2-digit",
+          year: "numeric",
+        });
+
         console.log(card);      
         tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp", link: "blog/"+card_list[i]}); // append multiple times to temp array
         tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp", link: "blog/"+card_list[i]}); // append multiple times to temp array
@@ -100,19 +110,24 @@ function HomeContent() {
         <div className="text-2xl sm:text-3xl font-bold text-gray-600 text-center">
           SEARCH PROJECTS
         </div>
-        <div className="mb-5">
-          <Suspense fallback={<div>Loading search...</div>}>
-            <SearchBar onSearch={refreshSearch}/>
-          </Suspense>
-        </div>
+        <Suspense fallback={<div>Loading search...</div>}>
+          <SearchBar onSearch={refreshSearch}/>
+        </Suspense>
           <div className="">
             <div id="card_container" className="px-[10%] portrait:px-[5%] max-w-[1600px] mx-auto grid grid-cols-1 gap-8">
                 {cards.length > 0 ? (
                   cards.map((data,index) => (
                     <Link href={data.link} key={index} className="flex justify-between card-background gap-4 ">
-                      <div>
-                        <h2 className="line-clamp-2 sm:line-clamp-1 text-xl font-bold mb-2 text-gray-700">{data.title}</h2>
-                        <p className="line-clamp-3 xl:line-clamp-5 text-gray-700">{data.description}</p>
+                      <div className="flex flex-col h-full">
+                        <h2 className="line-clamp-2 sm:line-clamp-1 text-xl font-bold mb-1 text-gray-700">{data.title}</h2>
+                        <p className="line-clamp-3 xl:line-clamp-5 text-gray-700 mb-1">{data.description}</p>
+                        <p className="text-xs italic text-gray-700 mt-auto">
+                          {new Date(data.date * 1000).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "2-digit",
+                            year: "numeric",
+                          })}
+                        </p>
                       </div>
                     
                       <Image 
