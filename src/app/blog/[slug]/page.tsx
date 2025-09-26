@@ -7,12 +7,31 @@ import { Header, Footer } from "@/app/elements";
 
 export default async function BlogPage({ params: promise_params }: { params: { slug: string } }) {
   const params = await promise_params;
-  const res = await fetch(`${BLOB}/blog_pages/${params.slug}/content.md`);
-  const res_card = await fetch(`${BLOB}/blog_pages/${params.slug}/card.json`)
-  const card = await res_card.json(); 
-  if (!res.ok) return notFound();
 
-  const markdown = await res.text();
+  const res_markdown = await fetch(`${BLOB}/blog_pages/${params.slug}/content.md`);
+  const res_meetadata = await fetch(`${BLOB}/blog_pages/${params.slug}/metadata.json`)
+
+  if (!res_markdown.ok || !res_meetadata.ok) return notFound();
+
+  const markdown = await res_markdown.text();
+  const metadata = await res_meetadata.json(); 
+
+  const metadata_timestamp = metadata.date * 1000; // convert to milliseconds
+  const metadata_date = new Date(metadata_timestamp);
+
+  const metadata_formattedDate = metadata_date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+  });
+  const metadata_formattedTime = metadata_date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).replace(":", ".");
+
+  const formattedDateTime = `${metadata_formattedDate} (${metadata_formattedTime})`;
+
 //   const markdown = `
 
 // # 👋 Hello, I'm Jibhong
@@ -41,13 +60,13 @@ export default async function BlogPage({ params: promise_params }: { params: { s
 
           <div className="mb-15">
             <div className="justify-end flex space-x-4 text-gray-600 text-sm">
-              {"Jan 12, 2025 (13.56)"}
+              {formattedDateTime}
             </div>
             <h1 className="text-4xl font-extrabold text-gray-900 mb-4">
-              {card.title}
+              {metadata.title}
             </h1>
             <h2 className="text-lg  text-gray-900 mb-4">
-              {card.description}
+              {metadata.description}
             </h2>
             <hr className="my-4 border-t border-gray-600" />
           </div>

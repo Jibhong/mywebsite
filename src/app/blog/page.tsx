@@ -38,7 +38,7 @@ function HomeContent() {
       const tempCards : Card[] = [];
       for(let i=0; i<Math.min(6,card_list.length); i++){
         console.log(i);
-        const res = await fetch(BLOB+"/blog_pages/"+card_list[i]+"/card.json");
+        const res = await fetch(BLOB+"/blog_pages/"+card_list[i]+"/metadata.json");
         const card = await res.json(); 
         console.log(card);      
         tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp", link: "blog/"+card_list[i]}); // append multiple times to temp array
@@ -74,7 +74,7 @@ function HomeContent() {
       const tempCards : Card[] = [];
       for(let i=0; i<card_list.length; i++){
         console.log(i);
-        const res = await fetch(BLOB+"/blog_pages/"+card_list[i]+"/card.json");
+        const res = await fetch(BLOB+"/blog_pages/"+card_list[i]+"/metadata.json");
         const card = await res.json(); 
         console.log(card);      
         tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp", link: "blog/"+card_list[i]}); // append multiple times to temp array
@@ -106,34 +106,32 @@ function HomeContent() {
           </Suspense>
         </div>
           <div className="">
-            <div id="card_container" className="px-10 xl:px-50 grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-8">
-              {cards.length > 0 ? (
-                cards.map((data,index) => (
-                  <Link href={data.link} key={index} className="grid grid-cols-2 card-background">
-                  <div>
-                    <h2 className="text-3xl font-bold mb-2 text-gray-700">{data.title}</h2>
-                    <p className="text-gray-700 mb-2">
-                        {data.description}
-                    </p>
-                  </div>
-
-                  <Image 
-                      src={data.thumbnail}
-                      alt="Repo image" 
-                      width={400} 
-                      height={400} 
-                      className=" w-30 h-30 xl:w-40 xl:h-40 object-cover rounded-2xl justify-self-end"
-                  />
-                  </Link>
-                ))
-              ) : (
-                <p className="col-span-full text-center text-gray-500 text-lg">
-                  No results found
-                </p>
-              )
-          }
-          </div>
-        </div>  
+            <div id="card_container" className="xl:px-[10%] px-10 portrait:px-5  grid grid-cols-1 gap-8">
+                {cards.length > 0 ? (
+                  cards.map((data,index) => (
+                    <Link href={data.link} key={index} className="flex justify-between  card-background gap-6 ">
+                      <div>
+                        <h2 className="line-clamp-2 sm:line-clamp-1 text-xl font-bold mb-2 text-gray-700">{data.title}</h2>
+                        <p className="line-clamp-3 xl:line-clamp-5 text-gray-700">{data.description}</p>
+                      </div>
+                    
+                      <Image 
+                          src={data.thumbnail}
+                          alt="Repo image" 
+                          width={400} 
+                          height={400} 
+                          className="w-30 h-30 xl:w-40 xl:h-40 object-cover rounded-2xl justify-self-end"
+                      />
+                    </Link>
+                  ))
+                ) : (
+                  <p className="col-span-full text-center text-gray-500 text-lg">
+                    No results found
+                  </p>
+                )
+            }
+            </div>
+          </div>  
       </div>
       <Footer/>
     </div>
