@@ -106,10 +106,10 @@ function HomeContent() {
           </Suspense>
         </div>
           <div className="">
-            <div id="card_container" className="xl:px-[10%] px-10 portrait:px-5  grid grid-cols-1 gap-8">
+            <div id="card_container" className="px-[10%] portrait:px-[5%] max-w-[1600px] mx-auto grid grid-cols-1 gap-8">
                 {cards.length > 0 ? (
                   cards.map((data,index) => (
-                    <Link href={data.link} key={index} className="flex justify-between  card-background gap-6 ">
+                    <Link href={data.link} key={index} className="flex justify-between card-background gap-4 ">
                       <div>
                         <h2 className="line-clamp-2 sm:line-clamp-1 text-xl font-bold mb-2 text-gray-700">{data.title}</h2>
                         <p className="line-clamp-3 xl:line-clamp-5 text-gray-700">{data.description}</p>
