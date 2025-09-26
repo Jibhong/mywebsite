@@ -8,6 +8,8 @@ import { Header, Footer } from "@/app/elements";
 export default async function BlogPage({ params: promise_params }: { params: { slug: string } }) {
   const params = await promise_params;
   const res = await fetch(`${BLOB}/blog_pages/${params.slug}/content.md`);
+  const res_card = await fetch(`${BLOB}/blog_pages/${params.slug}/card.json`)
+  const card = await res_card.json(); 
   if (!res.ok) return notFound();
 
   const markdown = await res.text();
@@ -31,24 +33,26 @@ export default async function BlogPage({ params: promise_params }: { params: { s
 // `
 
   return (
-     <div className="pt-30 font-sans bg-gradient-to-br from-blue-200 to-purple-200 min-h-screen flex flex-col">
+     <div className="pt-30 font-sans bg-orange-50 min-h-screen flex flex-col">
       <Header />
-      <div className="text-center">
-        <h1 className="text-4xl font-extrabold text-gray-900 mb-4">
-          Title
-        </h1>
-        <div className="mb-20 flex justify-center space-x-4 text-gray-600 text-sm">
-          <span>Date</span>
-          <span>•</span>
-          <span>By Author</span>
-          <span>•</span>
-          <span>XX min read</span>
-        </div>
-      </div>
       {/* Container */}
       <main className="flex-1 flex justify-center items-start">
         <div className="container max-w-3xl mx-auto p-6 min-h-screen">
-          <article className="prose prose-lg prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-800 prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 prose-code:bg-gray-200 prose-code:px-1 prose-code:rounded prose-blockquote:border-l-4 prose-blockquote:border-blue-400 prose-blockquote:bg-blue-50 prose-blockquote:p-4 prose-li:marker:text-purple-600">
+
+          <div className="mb-15">
+            <div className="justify-end flex space-x-4 text-gray-600 text-sm">
+              {"Jan 12, 2025 (13.56)"}
+            </div>
+            <h1 className="text-4xl font-extrabold text-gray-900 mb-4">
+              {card.title}
+            </h1>
+            <h2 className="text-lg  text-gray-900 mb-4">
+              {card.description}
+            </h2>
+            <hr className="my-4 border-t border-gray-600" />
+          </div>
+
+          <article className="mb-20 break-words text-red-500 prose prose-lg prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-800 prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 prose-code:bg-gray-200 prose-code:px-1 prose-code:rounded prose-blockquote:border-l-4 prose-blockquote:border-blue-400 prose-blockquote:bg-blue-50 prose-blockquote:p-4 prose-li:marker:text-purple-600">
             <Markdown
               components={{
                 h1: ({ children }) => (
