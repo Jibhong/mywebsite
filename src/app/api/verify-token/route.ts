@@ -11,7 +11,7 @@ export async function POST(req: Request) {
 }
 
 export async function generateNewToken(length = 64) {
-  const newToken = crypto.randomBytes(32).toString("hex");
+  const newToken = crypto.randomBytes(length).toString("hex");
   await dbSetString("TOKEN", newToken);
   return newToken;
 }

@@ -42,14 +42,6 @@ function HomeContent() {
         const res = await fetch(BLOB+"/blog_pages/"+card_list[i]+"/metadata.json");
         const card = await res.json(); 
 
-        const metadata_timestamp = card.date * 1000; // convert to milliseconds
-        const metadata_date = new Date(metadata_timestamp);
-        const formattedDateTime = metadata_date.toLocaleDateString("en-US", {
-          month: "short",
-          day: "2-digit",
-          year: "numeric",
-        });
-
         console.log(card);      
         tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp", link: "blog/"+card_list[i]}); // append multiple times to temp array
         tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp", link: "blog/"+card_list[i]}); // append multiple times to temp array
@@ -73,7 +65,7 @@ function HomeContent() {
     fetchCards();
   
     
-  }, []);
+  });
 
   async function refreshSearch(query:string) {
       const res = await fetch(

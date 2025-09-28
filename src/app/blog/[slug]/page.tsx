@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 const BLOB = process.env.NEXT_PUBLIC_VERCEL_BLOB_URL;
 
 import { Header, Footer } from "@/app/lib/elements";
+import Image from "next/image";
 
 export default async function BlogPage({ params: promise_params }: { params: { slug: string } }) {
   const params = await promise_params;
@@ -117,10 +118,11 @@ export default async function BlogPage({ params: promise_params }: { params: { s
                   </pre>
                 ),
                 img: ({ src, alt }) => (
-                  <img
-                    src={src || ""}
-                    alt={alt || ""}
-                    className="rounded-lg my-6 max-w-full"
+                  <Image
+                    src={src as string}
+                    alt={alt || "image"}
+                    fill
+                    className="rounded-lg my-6 object-cover"
                   />
                 ),
                 hr: () => <hr className="my-8 border-t border-gray-300" />,

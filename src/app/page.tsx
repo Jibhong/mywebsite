@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link"
-import { Header, Footer, SearchBar, Spinner } from "@/app/lib/elements";
+import { Header, Footer, SearchBar } from "@/app/lib/elements";
 import { useEffect, useState } from "react";
 import { Suspense } from "react";
 
