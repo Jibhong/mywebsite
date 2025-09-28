@@ -65,7 +65,7 @@ function HomeContent() {
     fetchCards();
   
     
-  });
+  }, []);
 
   async function refreshSearch(query:string) {
       const res = await fetch(

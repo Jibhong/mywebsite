@@ -53,7 +53,7 @@ function HomeContent() {
       }
     }
     fetchCards();
-  });
+  }, []);
 
 
   async function refreshSearch(query:string) {
