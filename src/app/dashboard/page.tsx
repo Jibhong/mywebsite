@@ -8,10 +8,9 @@ import RealHome from "./realPage"
 
 export default async function Home() {
 
-  const cookieStore = cookies(); // server-side cookie store
-  const token = (await cookieStore).get("token")?.value
+  const cookieHeader = (await cookies()).get("session")?.value
 
-  const ok = await verifyTokenServer(token);
+  const ok = await verifyTokenServer(cookieHeader);
 
   if (!ok) {
     redirect("/login");
