@@ -2,7 +2,7 @@ import sqlite3 from "sqlite3";
 import { open } from "sqlite";
 
 const dbString = await open({
-  filename: "./dbString.sqlite",
+  filename: "./tmp/dbString.sqlite",
   driver: sqlite3.Database
 });
 
