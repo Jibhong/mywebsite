@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link"
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
+import Image from "next/image";
+
 
 
 
@@ -64,7 +66,6 @@ export function Footer() {
 interface SearchBarProps {
   onSearch?: (query: string) => void;
 }
-
 export function SearchBar({ onSearch }: SearchBarProps) {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("search") || "";
@@ -101,4 +102,23 @@ export function SearchBar({ onSearch }: SearchBarProps) {
       </button>
     </form>
   );
+}
+
+export function Spinner() {
+  return (
+    <Image
+      src="/spinner.webp"
+      alt="Loading..."
+      width={200}
+      height={200}
+      className="animate-zoom-fade-spin drop-shadow-alpha"
+    />
+  );
+}
+export function BigSpinner() {
+  return (
+    <div className="font-sans bg-orange-50 min-h-screen flex items-center justify-center overflow-y-auto">
+      <Spinner />
+    </div>
+  )
 }

@@ -41,3 +41,34 @@ body {
     display: inline-flex;
     animation: scroll 30s linear infinite;
   }
+  
+@layer utilities {
+  @keyframes zoom-fade-spin {
+    0% {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+    /* 50% {
+      transform: scale(1.2) rotate(180deg);
+      opacity: 1;
+    } */
+    30% {
+      transform: scale(1.6);
+      opacity: 01;
+    }
+    100% {
+      transform: scale(1.6);
+      opacity: 0;
+    }
+  }
+
+  .animate-zoom-fade-spin {
+    animation: zoom-fade-spin 1s ease infinite;
+  }
+}
+
+@layer utilities {
+  .drop-shadow-alpha {
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+  }
+}

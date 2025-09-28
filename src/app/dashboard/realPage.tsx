@@ -3,12 +3,11 @@ import Fuse from "fuse.js";
 
 import Image from "next/image";
 import Link from "next/link"
-import { Header, Footer, SearchBar } from "@/app/lib/elements";
+import { Header, Footer, SearchBar, BigSpinner } from "@/app/lib/elements";
 import { useEffect, useState } from "react";
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-
-
+import { verifyToken } from "@/app/lib/tokenAuth";
 
 
 const BLOB  = process.env.NEXT_PUBLIC_VERCEL_BLOB_URL;
@@ -23,11 +22,11 @@ interface Card {
 }
 
 function HomeContent() {
+
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("search") || "";
 
   const [cards, setCards] = useState<Card[]>([]);
-	
 
   useEffect(() => {
     async function fetchCards() {
@@ -52,12 +51,6 @@ function HomeContent() {
 
         console.log(card);      
         tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp", link: "blog/"+card_list[i]}); // append multiple times to temp array
-        tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp", link: "blog/"+card_list[i]}); // append multiple times to temp array
-        tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp", link: "blog/"+card_list[i]}); // append multiple times to temp array
-        tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp", link: "blog/"+card_list[i]}); // append multiple times to temp array
-        tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp", link: "blog/"+card_list[i]}); // append multiple times to temp array
-        tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp", link: "blog/"+card_list[i]}); // append multiple times to temp array
-        tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp", link: "blog/"+card_list[i]}); // append multiple times to temp array
 
       }
       if (searchQuery) {
@@ -68,37 +61,34 @@ function HomeContent() {
         setCards(tempCards);
       }
     }
-
-    
     fetchCards();
-  
-    
-  }, []);
+  },[]);
+
 
   async function refreshSearch(query:string) {
-      const res = await fetch(
-        BLOB+"/blog_pages/index.json"
-      );
-      const card_list = await res.json();
-      console.log(card_list);
-      const tempCards : Card[] = [];
-      for(let i=0; i<card_list.length; i++){
-        console.log(i);
-        const res = await fetch(BLOB+"/blog_pages/"+card_list[i]+"/metadata.json");
-        const card = await res.json(); 
-        console.log(card);      
-        tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp", link: "blog/"+card_list[i]}); // append multiple times to temp array
+    const res = await fetch(
+      BLOB+"/blog_pages/index.json"
+    );
+    const card_list = await res.json();
+    console.log(card_list);
+    const tempCards : Card[] = [];
+    for(let i=0; i<card_list.length; i++){
+      console.log(i);
+      const res = await fetch(BLOB+"/blog_pages/"+card_list[i]+"/metadata.json");
+      const card = await res.json(); 
+      console.log(card);      
+      tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp", link: "blog/"+card_list[i]}); // append multiple times to temp array
 
-      }
-      const fuse = new Fuse(tempCards, {
-        keys: ["title", "description"], // fields to search
-        threshold: 0.3, // lower = stricter match
-      });
-      const results = query ? fuse.search(query).map(result => result.item) : tempCards;
-      setCards(results);
     }
+    const fuse = new Fuse(tempCards, {
+      keys: ["title", "description"], // fields to search
+      threshold: 0.3, // lower = stricter match
+    });
+    const results = query ? fuse.search(query).map(result => result.item) : tempCards;
+    setCards(results);
+  }
   
-  return (
+    return (
     <div className="font-sans bg-orange-50 pt-30 overflow-y-auto">
       <div className="min-h-screen pb-10">
 
@@ -154,9 +144,9 @@ function HomeContent() {
 }
 
 
-export default function Home() {
+export default function RealHome() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div><BigSpinner /></div>}>
       <HomeContent />
     </Suspense>
   );
