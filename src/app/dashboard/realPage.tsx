@@ -135,7 +135,7 @@ function HomeContent() {
 }
 
 
-export default function RealHome() {
+export default async function DashboardPage() {
   return (
     <Suspense fallback={<div><BigSpinner /></div>}>
       <HomeContent />

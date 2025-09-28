@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 
 
 
-import DashboardPage from "./realPage"
+import NewPage from "./realPage"
 
 export default async function Home() {
 
@@ -16,6 +16,6 @@ export default async function Home() {
     redirect("/login");
   }
   else return (
-    <DashboardPage />
+    <NewPage />
   );
 }
