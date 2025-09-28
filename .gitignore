@@ -45,4 +45,6 @@ next-env.d.ts
 /.vscode
 .vscode
 
-dbString.sqlite
+
+tmp/*
+temp/*
