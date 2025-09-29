@@ -7,6 +7,7 @@ import { Header, Footer, SearchBar, BigSpinner } from "@/app/lib/elements";
 import { useEffect, useState } from "react";
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import { HeaderDashboard } from "../lib/element.dashboard";
 
 
 const BLOB  = process.env.NEXT_PUBLIC_VERCEL_BLOB_URL;
@@ -83,7 +84,7 @@ function HomeContent() {
     <div className="font-sans bg-orange-50 pt-30 overflow-y-auto">
       <div className="min-h-screen pb-10">
 
-        <Header/>
+        <HeaderDashboard/>
 
 
 
@@ -135,7 +136,7 @@ function HomeContent() {
 }
 
 
-export default async function DashboardPage() {
+export default function DashboardPage() {
   return (
     <Suspense fallback={<div><BigSpinner /></div>}>
       <HomeContent />
