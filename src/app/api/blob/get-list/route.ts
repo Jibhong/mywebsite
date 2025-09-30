@@ -18,12 +18,11 @@ export async function GET(req: Request) {
   const output: Record<string, Promise<{ name: string; url: string }[]>> = {};
 
   for (const e of allPath) {
-    const res = await listFolderPaths(e); // { paths: [...] }
-    const pathsArray = res.paths;
+    const res = await listFolderPaths(e);
+    const pathsArray = res?.paths ?? [];
 
     const foldersSet = new Set<string>();
 
-    // Filter first-level folders only, ignoring files
     pathsArray.forEach(p => {
       if (!p.startsWith(`${e}/`)) return;
 
@@ -35,16 +34,18 @@ export async function GET(req: Request) {
       }
     });
 
-    // Assign promise for each folder
     for (const folder of foldersSet) {
-      output[path.basename(folder)] = getProtectedFilesUrls(folder); // store promise
+      output[path.basename(folder)] = getProtectedFilesUrls(folder) ?? Promise.resolve([]);
     }
   }
 
-  // Resolve all promises at once
+  if (Object.keys(output).length === 0) {
+    return NextResponse.json({});
+  }
+
   const resolvedOutput = Object.fromEntries(
     await Promise.all(
-      Object.entries(output).map(async ([key, promise]) => [key, await promise])
+      Object.entries(output).map(async ([key, promise]) => [key, await promise ?? []])
     )
   ) as Record<string, { name: string; url: string }[]>;
 
