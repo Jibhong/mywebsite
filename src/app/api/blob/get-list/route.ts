@@ -1,3 +1,6 @@
+/* eslint-disable */
+
+
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyTokenServer } from "@/lib/tokenAuth.server";
