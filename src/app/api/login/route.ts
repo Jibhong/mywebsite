@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
-import { dbGetString, dbRemoveString, dbSetString } from "@/app/lib/dbHandler";
+import { dbGetString, dbRemoveString, dbSetString } from "@/lib/dbHandler";
 
 
 export async function POST(req: Request) {
