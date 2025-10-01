@@ -58,7 +58,7 @@ export async function getProtectedFilesUrls(folderPath: string): Promise<{ name:
 }
 
 
-export async function getAllBlogPath(){
+export async function getAllBlogPath(): Promise<string[]>{
   const allPath = ["blog_page", "blog_page_protected"];
 	// let output: Record<string, Promise<{ name: string; url: string }[]>> = {}; // store as Promise
 
