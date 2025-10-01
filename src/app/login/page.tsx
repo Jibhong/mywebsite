@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Cookies from "js-cookie";
 
 
 export default function LoginPage() {
@@ -32,7 +31,6 @@ export default function LoginPage() {
     if (res.ok) {
       const response = await res.json();
       console.log(response);
-      await Cookies.set("token", response.token, { expires: 7, path: "/" });
       window.location.href = "/dashboard";
     }
   };

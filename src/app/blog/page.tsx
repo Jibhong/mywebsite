@@ -3,10 +3,11 @@ import Fuse from "fuse.js";
 
 import Image from "next/image";
 import Link from "next/link"
-import { Header, Footer, SearchBar } from "@/app/lib/elements";
+import { Header, Footer, SearchBar } from "@/lib/elements";
 import { useEffect, useState } from "react";
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import { getBlobUrl } from "@/lib/blobInterface";
 
 
 
@@ -31,25 +32,17 @@ function HomeContent() {
 
   useEffect(() => {
     async function fetchCards() {
-      const res = await fetch(
-        BLOB+"/blog_pages/index.json"
-      );
+      const res = await fetch(await getBlobUrl("/blog_page/index.json"));
       const card_list = await res.json();
       console.log(card_list);
       const tempCards : Card[] = [];
       for(let i=0; i<Math.min(6,card_list.length); i++){
         console.log(i);
-        const res = await fetch(BLOB+"/blog_pages/"+card_list[i]+"/metadata.json");
+        const res = await fetch(await getBlobUrl("/blog_page/"+card_list[i]+"/metadata.json"));
         const card = await res.json(); 
 
         console.log(card);      
-        tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp", link: "blog/"+card_list[i]}); // append multiple times to temp array
-        tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp", link: "blog/"+card_list[i]}); // append multiple times to temp array
-        tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp", link: "blog/"+card_list[i]}); // append multiple times to temp array
-        tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp", link: "blog/"+card_list[i]}); // append multiple times to temp array
-        tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp", link: "blog/"+card_list[i]}); // append multiple times to temp array
-        tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp", link: "blog/"+card_list[i]}); // append multiple times to temp array
-        tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp", link: "blog/"+card_list[i]}); // append multiple times to temp array
+        tempCards.push({ ...card, path: card_list[i], thumbnail: await getBlobUrl("/blog_page/"+card_list[i]+"/preview.webp"), link: "blog/"+card_list[i]}); // append multiple times to temp array
 
       }
       if (searchQuery) {

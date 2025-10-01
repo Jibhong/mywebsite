@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 const BLOB = process.env.NEXT_PUBLIC_VERCEL_BLOB_URL;
 
-import { Header, Footer } from "@/app/lib/elements";
+import { Header, Footer } from "@/lib/elements";
 import Image from "next/image";
 
 export default async function BlogPage({ params: promise_params }: { params: { slug: string } }) {

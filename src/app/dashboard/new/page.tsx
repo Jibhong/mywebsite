@@ -1,10 +1,10 @@
 import { verifyTokenServer } from "@/lib/tokenAuth.server";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+import { getBlogUrl } from "@/lib/newBlog";
 
 
 
-import DashboardPage from "./realPage"
 
 export default async function Home() {
 
@@ -12,10 +12,12 @@ export default async function Home() {
 
   const ok = await verifyTokenServer(cookieHeader);
 
+  const location = await getBlogUrl();
+
   if (!ok) {
     redirect("/login");
   }
-  else return (
-    <DashboardPage />
-  );
+  else {
+    redirect(`/dashboard/edit/${location}`);
+  }
 }

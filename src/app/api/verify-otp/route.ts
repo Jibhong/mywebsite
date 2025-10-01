@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentOtp } from "@/app/api/login/route";
-import { dbRemoveString } from "@/app/lib/dbHandler";
+import { dbRemoveString } from "@/lib/dbHandler";
 import { serialize } from "cookie";
 import jwt from 'jsonwebtoken';
 
@@ -18,7 +18,7 @@ export async function POST(req: Request) {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
-        path: "/dashboard",
+        path: "/",
         // keep in sync with token lifetime; here 1 day (in seconds)
         maxAge: 60 * 60 * 24,
     });
