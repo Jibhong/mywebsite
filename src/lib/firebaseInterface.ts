@@ -10,7 +10,7 @@ async function initFirebase() {
   if (!admin.apps.length) {
     const projectId = process.env.FIREBASE_PROJECT_ID;
     const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-    let privateKey = process.env.FIREBASE_PRIVATE_KEY;
+    const privateKey = process.env.FIREBASE_PRIVATE_KEY;
     const storageBucket = process.env.FIREBASE_STORAGE_BUCKET;
 
     const requiredVars = [
@@ -26,8 +26,6 @@ async function initFirebase() {
       console.error("Missing Firebase environment variables:", missingVars.join(", "));
       throw new Error(`Missing Firebase environment variables: ${missingVars.join(", ")}`);
     }
-
-    privateKey = privateKey.replace(/\\n/g, "\n");
 
     admin.initializeApp({
       credential: admin.credential.cert({
