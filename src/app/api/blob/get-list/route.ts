@@ -22,12 +22,8 @@ export async function GET(req: Request) {
   for (const folder of allPath){
     output[path.basename(folder)] = await getProtectedFilesUrls(folder);
   }
-  
-  if (Object.keys(output).length === 0) {
-    return NextResponse.json({}, { status: 200 });
-  }
 
   // console.log(output)
 
-  return NextResponse.json(output, { status: 200 });
+  return NextResponse.json(output ?? {}, { status: 200 });
 }
