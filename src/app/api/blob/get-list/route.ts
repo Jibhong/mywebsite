@@ -5,7 +5,7 @@ import { getAllBlogPath } from "@/lib/firebaseInterface";
 import { getProtectedFilesUrls } from "@/lib/firebaseInterface";
 import path from "path";
 
-export async function GET(req: Request) {
+export async function GET() {
   const cookieHeader = (await cookies()).get("session")?.value;
   const ok = await verifyTokenServer(cookieHeader);
 

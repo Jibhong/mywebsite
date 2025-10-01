@@ -150,23 +150,19 @@ export default function HomeContent( { slug: slug, blogDataUrlPair: blogDataUrl 
       if (found_markdown) {
         res_markdown = await fetch(found_markdown.url);
       }
+      const markdown = await res_markdown?.text();
+      if(markdown) setMarkdown(markdown);
 
-
+      
+      
+      
       const found_metadata = blogDataUrl.find(file => file.name === "metadata.json");
-      let res_metadata: Record<string, any> = {};
-
       if (found_metadata) {
-        res_metadata = await fetch(found_metadata.url);
+        const metadata = await (await fetch(found_metadata.url)).json();
+        if(metadata) setTitle(metadata.title);
+        if(metadata) setDescription(metadata.description);
       }
 
-
-
-      const markdown = await res_markdown?.text();
-      const metadata = await res_metadata.json();
-
-      if(markdown) setMarkdown(markdown);
-      if(metadata) setTitle(metadata.title);
-      if(metadata) setDescription(metadata.description);
 
       // get preview.webp url
       const thumbnail = blogDataUrl.find(file => file.name === "preview.webp")?.url;
