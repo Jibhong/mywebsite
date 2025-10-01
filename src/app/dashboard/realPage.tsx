@@ -52,7 +52,8 @@ function HomeContent() {
         const res = await fetch(metadataUrl);
         const card = await res.json(); 
         tempCards.push({ ...card, path: directory, thumbnail: thumbnailUrl, link: "dashboard/edit/"+directory}); // append multiple times to temp array
-        
+        setCards(prev => [...prev, { ...card, path: directory, thumbnail: thumbnailUrl, link: "dashboard/edit/" + directory }]);
+
       }
       console.log(tempCards);    
 
