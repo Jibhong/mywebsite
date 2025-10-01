@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyTokenServer } from "@/lib/tokenAuth.server";
-import { getAllBlogPath } from "@/lib/firebaseInterface";
-import { getProtectedFilesUrls } from "@/lib/firebaseInterface";
-import path from "path";
+import { getAllBlogPath, getProtectedFilesUrls } from "@/lib/firebaseInterface";
 
 export async function GET(req: Request) {
   const cookieHeader = (await cookies()).get("session")?.value;
@@ -18,8 +16,13 @@ export async function GET(req: Request) {
 
   for (const folder of allPath) {
     const urls = (await getProtectedFilesUrls(folder)) ?? [];
-    output[path.basename(folder)] = urls;
+    output[getBaseName(folder)] = urls;
   }
 
   return NextResponse.json(output ?? {}, { status: 200 });
+}
+
+function getBaseName(folder: string): string {
+  const parts = folder.split("/").filter(Boolean);
+  return parts[parts.length - 1] || folder;
 }
