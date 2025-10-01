@@ -3,19 +3,33 @@ import * as admin from "firebase-admin";
 import path from "path";
 
 
-// Initialize Admin SDK only once
+// Only initialize once
 if (!admin.apps.length) {
+  const projectId = process.env.FIREBASE_PROJECT_ID;
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+  let privateKey = process.env.FIREBASE_PRIVATE_KEY;
+  const storageBucket = process.env.FIREBASE_STORAGE_BUCKET;
+
+  // Ensure env vars exist
+  if (!projectId || !clientEmail || !privateKey || !storageBucket) {
+    throw new Error(
+      "Missing Firebase environment variables. Make sure FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY, FIREBASE_STORAGE_BUCKET are set."
+    );
+  }
+
+  // Replace literal '\n' with actual newlines
+  privateKey = privateKey.replace(/\\n/g, "\n");
+
   admin.initializeApp({
     credential: admin.credential.cert({
-      projectId: process.env.FIREBASE_PROJECT_ID!,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL!,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY!,
+      projectId,
+      clientEmail,
+      privateKey,
     }),
-    storageBucket: process.env.FIREBASE_STORAGE_BUCKET!,
+    storageBucket,
   });
-  
 }
-// Export storage bucket
+
 export const bucket = admin.storage().bucket();
 
 /**

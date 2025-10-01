@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyTokenServer } from "@/lib/tokenAuth.server";
-import { getAllBlogPath, getProtectedFilesUrls } from "@/lib/firebaseInterface";
+import { getAllBlogPath } from "@/lib/firebaseInterface";
+import { getProtectedFilesUrls } from "@/lib/firebaseInterface";
+import path from "path";
 
 export async function GET(req: Request) {
   const cookieHeader = (await cookies()).get("session")?.value;
@@ -11,18 +13,13 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
 
-  // const allPath = (await getAllBlogPath()) ?? [];
-  // const output: Record<string, { name: string; url: string }[]> = {};
+  const allPath = (await getAllBlogPath()) ?? [];
+  const output: Record<string, { name: string; url: string }[]> = {};
 
-  // for (const folder of allPath) {
-  //   const urls = (await getProtectedFilesUrls(folder)) ?? [];
-  //   output[getBaseName(folder)] = urls;
-  // }
+  for (const folder of allPath) {
+    const urls = (await getProtectedFilesUrls(folder)) ?? [];
+    output[path.basename(folder)] = urls;
+  }
 
-  // return NextResponse.json(output ?? {}, { status: 200 });
-}
-
-function getBaseName(folder: string): string {
-  const parts = folder.split("/").filter(Boolean);
-  return parts[parts.length - 1] || folder;
+  return NextResponse.json(output ?? {}, { status: 200 });
 }
