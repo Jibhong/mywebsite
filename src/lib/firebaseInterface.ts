@@ -3,10 +3,6 @@ import * as admin from "firebase-admin";
 import path from "path";
 
 
-
-// Parse service account JSON from .env
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT! as string);
-
 // Initialize Admin SDK only once
 if (!admin.apps.length) {
   admin.initializeApp({
