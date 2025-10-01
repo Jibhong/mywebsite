@@ -6,9 +6,7 @@ import { getBlogUrl } from "@/lib/newBlog";
 
 
 
-export default async function Home({ params : promiseParam }: { params: { slug: string } }) {
-
-  const params = await promiseParam;
+export default async function Home() {
 
   const cookieHeader = (await cookies()).get("session")?.value
 
