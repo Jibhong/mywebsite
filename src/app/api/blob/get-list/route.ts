@@ -11,15 +11,15 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
 
-  const allPath = (await getAllBlogPath()) ?? [];
-  const output: Record<string, { name: string; url: string }[]> = {};
+  // const allPath = (await getAllBlogPath()) ?? [];
+  // const output: Record<string, { name: string; url: string }[]> = {};
 
-  for (const folder of allPath) {
-    const urls = (await getProtectedFilesUrls(folder)) ?? [];
-    output[getBaseName(folder)] = urls;
-  }
+  // for (const folder of allPath) {
+  //   const urls = (await getProtectedFilesUrls(folder)) ?? [];
+  //   output[getBaseName(folder)] = urls;
+  // }
 
-  return NextResponse.json(output ?? {}, { status: 200 });
+  // return NextResponse.json(output ?? {}, { status: 200 });
 }
 
 function getBaseName(folder: string): string {
