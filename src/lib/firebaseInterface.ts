@@ -8,6 +8,7 @@ let bucket: Bucket;
 
 async function initFirebase() {
   if (!admin.apps.length) {
+    console.log("Login to firebase service account");
     const projectId = process.env.FIREBASE_PROJECT_ID;
     const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
     const privateKey = process.env.FIREBASE_PRIVATE_KEY;
