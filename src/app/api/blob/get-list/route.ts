@@ -19,7 +19,7 @@ export async function GET(req: Request) {
   //   output[getBaseName(folder)] = urls;
   // }
 
-  return NextResponse.json({}, { status: 200 });
+  return NextResponse.json(output ?? {}, { status: 200 });
 }
 
 function getBaseName(folder: string): string {
