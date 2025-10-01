@@ -5,9 +5,9 @@ import { getBucket } from "@/lib/firebaseInterface"; // your firebase.ts
  * Generate a random folder that does not exist in /blog_page or /blog_page_protected
  */
 async function generateUniqueFolder(): Promise<string> {
+  const bucket = await getBucket();
   let folderName: string = "";
   let exists = true;
-  const bucket = await getBucket();
 
   while (exists) {
     // Random 8-character folder name
@@ -28,6 +28,7 @@ async function generateUniqueFolder(): Promise<string> {
  * Create JSON file inside a new unique folder in /blog_page_protected
  */
 export async function getBlogUrl(): Promise<string> {
+  const bucket = await getBucket();
   const folderName = await generateUniqueFolder();
   const folderPath = `blog_page_protected/${folderName}/`;
 
