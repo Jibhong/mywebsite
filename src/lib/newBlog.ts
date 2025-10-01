@@ -1,4 +1,4 @@
-import { bucket } from "@/lib/firebaseInterface"; // your firebase.ts
+import { getBucket } from "@/lib/firebaseInterface"; // your firebase.ts
 
 
 /**
@@ -7,6 +7,7 @@ import { bucket } from "@/lib/firebaseInterface"; // your firebase.ts
 async function generateUniqueFolder(): Promise<string> {
   let folderName: string = "";
   let exists = true;
+  const bucket = await getBucket();
 
   while (exists) {
     // Random 8-character folder name

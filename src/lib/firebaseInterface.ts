@@ -1,43 +1,50 @@
 // lib/firebaseInterface.ts
 import * as admin from "firebase-admin";
 import path from "path";
+import { Bucket } from "@google-cloud/storage";
 
 
-// Only initialize once
-if (!admin.apps.length) {
-  const projectId = process.env.FIREBASE_PROJECT_ID;
-  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-  let privateKey = process.env.FIREBASE_PRIVATE_KEY;
-  const storageBucket = process.env.FIREBASE_STORAGE_BUCKET;
+let bucket: Bucket;
 
-  // Ensure env vars exist
-  if (!projectId || !clientEmail || !privateKey || !storageBucket) {
-    throw new Error(
-      "Missing Firebase environment variables. Make sure FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY, FIREBASE_STORAGE_BUCKET are set."
-    );
+function initFirebase() {
+  if (!admin.apps.length) {
+    const projectId = process.env.FIREBASE_PROJECT_ID;
+    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+    let privateKey = process.env.FIREBASE_PRIVATE_KEY;
+    const storageBucket = process.env.FIREBASE_STORAGE_BUCKET;
+
+    if (!projectId || !clientEmail || !privateKey || !storageBucket) {
+      throw new Error(
+        "Missing Firebase environment variables. Make sure FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY, FIREBASE_STORAGE_BUCKET are set."
+      );
+    }
+
+    privateKey = privateKey.replace(/\\n/g, "\n");
+
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId,
+        clientEmail,
+        privateKey,
+      }),
+      storageBucket,
+    });
   }
 
-  // Replace literal '\n' with actual newlines
-  privateKey = privateKey.replace(/\\n/g, "\n");
-
-  admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId,
-      clientEmail,
-      privateKey,
-    }),
-    storageBucket,
-  });
+  bucket = admin.storage().bucket();
 }
 
-export const bucket = admin.storage().bucket();
+export async function getBucket() {
+  if (!bucket) initFirebase();
+  return bucket;
+}
 
 /**
  * List all file paths directly inside a folder (not recursive).
  */
 export async function listFolderPaths(folderPath: string = ""): Promise<{ paths: string[] }> {
+  await getBucket();
   const cleanPath = folderPath.replace(/^\/+/, "");
-
   const [files] = await bucket.getFiles({
     prefix: cleanPath.endsWith("/") ? cleanPath : cleanPath + "/",
     // delimiter: "/", // prevents recursion if needed
@@ -50,6 +57,7 @@ export async function listFolderPaths(folderPath: string = ""): Promise<{ paths:
 
 
 export async function getProtectedFilesUrls(folderPath: string): Promise<{ name: string; url: string }[]> {
+  await getBucket();
   // List all files in the folder
   const [files] = await bucket.getFiles({ prefix: folderPath });
 
