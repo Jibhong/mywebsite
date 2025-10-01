@@ -7,7 +7,7 @@
 //     const res_json = await res.json();
 //     return res_json.url;
 // }
-const BUCKET = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET!; 
+const BUCKET = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET; 
 
 export async function getBlobUrl(path: string): Promise<string> {
   if (path.startsWith("/")) path = path.slice(1);
