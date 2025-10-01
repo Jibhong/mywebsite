@@ -6,12 +6,12 @@ import { Bucket } from "@google-cloud/storage";
 
 let bucket: Bucket;
 
-function initFirebase() {
+async function initFirebase() {
   if (!admin.apps.length) {
     const projectId = process.env.FIREBASE_PROJECT_ID;
     const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
     let privateKey = process.env.FIREBASE_PRIVATE_KEY;
-    const storageBucket = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET;
+    const storageBucket = process.env.FIREBASE_STORAGE_BUCKET;
 
     if (!projectId || !clientEmail || !privateKey || !storageBucket) {
       throw new Error(
@@ -31,11 +31,11 @@ function initFirebase() {
     });
   }
 
-  bucket = admin.storage().bucket();
+  return admin.storage().bucket();
 }
 
 export async function getBucket() {
-  if (!bucket) initFirebase();
+  if (!bucket) bucket = await initFirebase()
   return bucket;
 }
 
