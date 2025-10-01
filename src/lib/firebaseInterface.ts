@@ -95,24 +95,21 @@ export async function getAllBlogPath(): Promise<string[]>{
   const allPath = ["blog_page", "blog_page_protected"];
 	// let output: Record<string, Promise<{ name: string; url: string }[]>> = {}; // store as Promise
 
-  const foldersSet = new Set<string>();
-	for (const e of allPath) {
-		const res = await listFolderPaths(e); // { paths: [...] }
-		const pathsArray = res.paths;
+  const folderResults = await Promise.all(
+    allPath.map((e) => listFolderPaths(e))
+  );
 
-
-		// Filter first-level folders only, ignoring files
-		pathsArray.forEach(p => {
-			if (!p.startsWith(`${e}/`)) return;
-
-			const cleaned = p.endsWith('/') ? p.slice(0, -1) : p;
-			const parts = cleaned.split('/');
-
-			if (parts.length >= 2 && !parts[1].includes('.')) {
-				foldersSet.add(`${parts[0]}/${parts[1]}/`);
-			}
-		});
-
-	}
-  return Array.from(foldersSet);
+  const foldersArray: string[] = folderResults.flatMap((res, index) => {
+    const basePath = allPath[index];
+    return res.paths
+      .filter((p) => p.startsWith(`${basePath}/`))
+      .map((p) => {
+        const cleaned = p.endsWith('/') ? p.slice(0, -1) : p;
+        const parts = cleaned.split('/');
+        return parts.length >= 2 && !parts[1].includes('.') ? `${parts[0]}/${parts[1]}/` : null;
+      })
+      .filter((p): p is string => p !== null); // Type guard to remove nulls
+  });
+  
+  return foldersArray;
 }
