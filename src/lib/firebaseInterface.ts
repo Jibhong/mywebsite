@@ -63,24 +63,32 @@ export async function listFolderPaths(folderPath: string = ""): Promise<{ paths:
 }
 
 
-export async function getProtectedFilesUrls(folderPath: string): Promise<{ name: string; url: string }[]> {
+const urlCache: Record<string, { name: string; url: string; expires: number }> = {};
+
+export async function getProtectedFilesUrls(folderPath: string) {
   await getBucket();
-  // List all files in the folder
   const [files] = await bucket.getFiles({ prefix: folderPath });
 
-  // Generate signed URLs for each file
+  const now = Date.now();
   const result = await Promise.all(
     files.map(async (file) => {
+      const name = path.basename(file.name);
+      const cached = urlCache[file.name];
+      if (cached && cached.expires > now) return { name, url: cached.url };
+      console.log("Fetching signed url");
       const [url] = await file.getSignedUrl({
         action: "read",
-        expires: Date.now() + 60 * 60 * 1000, // 1 hour
+        expires: now + 60 * 60 * 1000,
       });
-      return { name: path.basename(file.name), url };
+
+      urlCache[file.name] = { name, url, expires: now + 60 * 60 * 1000 };
+      return { name, url };
     })
   );
 
   return result;
 }
+
 
 
 export async function getAllBlogPath(): Promise<string[]>{
