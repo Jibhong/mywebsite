@@ -28,23 +28,28 @@ function HomeContent() {
   const searchQuery = searchParams.get("search") || "";
 
   const [cards, setCards] = useState<Card[]>([]);
-	
+
+  const [cardList, setCardList] = useState<string[]>([]);
+  const [allCard, setAllCard] = useState<Card[]>([]);
+
 
   useEffect(() => {
     async function fetchCards() {
       const res = await fetch(await getBlobUrl("/blog_page/index.json"));
-      const card_list = await res.json();
-      console.log(card_list);
+      const list = await res.json();
+      setCardList(list)
+      console.log(list)
       const tempCards : Card[] = [];
-      for(let i=0; i<Math.min(6,card_list.length); i++){
+      for(let i=0; i<Math.min(6,list.length); i++){
         console.log(i);
-        const res = await fetch(await getBlobUrl("/blog_page/"+card_list[i]+"/metadata.json"));
+        const res = await fetch(await getBlobUrl("/blog_page/"+list[i]+"/metadata.json"));
         const card = await res.json(); 
 
-        console.log(card);      
-        tempCards.push({ ...card, path: card_list[i], thumbnail: await getBlobUrl("/blog_page/"+card_list[i]+"/preview.webp"), link: "blog/"+card_list[i]}); // append multiple times to temp array
+        tempCards.push({ ...card, path: list[i], thumbnail: getBlobUrl("/blog_page/"+list[i]+"/preview.webp"), link: "blog/"+list[i]}); // append multiple times to temp array
+        setCards(prev => [...prev, { ...card, path: list[i], thumbnail: getBlobUrl("/blog_page/"+list[i]+"/preview.webp"), link: "blog/"+list[i]}]);
 
       }
+      setAllCard(tempCards);
       if (searchQuery) {
         const fuse = new Fuse(tempCards, { keys: ["title", "description"], threshold: 0.3 });
         const results = fuse.search(searchQuery).map((result) => result.item);
@@ -53,35 +58,34 @@ function HomeContent() {
         setCards(tempCards);
       }
     }
-
+    
     
     fetchCards();
-  
+    
     
   }, []);
-
+  
   async function refreshSearch(query:string) {
-      const res = await fetch(
-        BLOB+"/blog_pages/index.json"
-      );
-      const card_list = await res.json();
-      console.log(card_list);
-      const tempCards : Card[] = [];
-      for(let i=0; i<card_list.length; i++){
-        console.log(i);
-        const res = await fetch(BLOB+"/blog_pages/"+card_list[i]+"/metadata.json");
-        const card = await res.json(); 
-        console.log(card);      
-        tempCards.push({ ...card, path: card_list[i], thumbnail: BLOB+"/blog_pages/"+card_list[i]+"/preview.webp", link: "blog/"+card_list[i]}); // append multiple times to temp array
+      // console.log(cardList);
+      // const tempCards : Card[] = [];
+      // for(let i=0; i<cardList.length; i++){
+      //   console.log(i);
+      //   const res = await fetch(await getBlobUrl("/blog_page/"+cardList[i]+"/metadata.json"));
+      //   const card = await res.json(); 
+      //   console.log(card);      
+      //   tempCards.push({ ...card, path: cardList[i], thumbnail: getBlobUrl("/blog_page/"+cardList[i]+"/preview.webp"), link: "blog/"+cardList[i]}); // append multiple times to temp array
+      //   // setCards(prev => [...prev, { ...card, path: card_list[i], thumbnail: getBlobUrl("/blog_page/"+card_list[i]+"/preview.webp"), link: "blog/"+card_list[i]}]);
 
-      }
-      const fuse = new Fuse(tempCards, {
+
+      // }
+
+      const fuse = new Fuse(allCard, {
         keys: ["title", "description"], // fields to search
         threshold: 0.3, // lower = stricter match
       });
-      const results = query ? fuse.search(query).map(result => result.item) : tempCards;
+      const results = query ? fuse.search(query).map(result => result.item) : allCard;
       setCards(results);
-    }
+  }
   
   return (
     <div className="font-sans bg-orange-50 pt-30 overflow-y-auto">

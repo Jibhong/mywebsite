@@ -25,6 +25,7 @@ export default function Home() {
 
 
   useEffect(() => {
+    
     async function fetchCards() {
       const res = await fetch(await getBlobUrl("/blog_page/index.json"));
       const card_list = await res.json();
@@ -36,9 +37,10 @@ export default function Home() {
         const card = await res.json(); 
         console.log(card);      
         tempCards.push({ ...card, path: card_list[i], thumbnail: await getBlobUrl("/blog_page/"+card_list[i]+"/preview.webp"), link: "blog/"+card_list[i]}); // append multiple times to temp array
-
+        setCards(prev => [...prev, { ...card, path: card_list[i], thumbnail: getBlobUrl("/blog_page/"+card_list[i]+"/preview.webp"), link: "blog/"+card_list[i]}]);
+ 
       }
-      setCards(tempCards);
+      // setCards(tempCards);
     }
     fetchCards();
   }, []);
