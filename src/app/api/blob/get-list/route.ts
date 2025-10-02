@@ -5,7 +5,8 @@ import { getAllBlogPath } from "@/lib/firebaseInterface";
 import { getProtectedFilesUrls } from "@/lib/firebaseInterface";
 import path from "path";
 
-export async function GET(req: Request) {
+export async function GET() {
+  console.log(`Start: ${new Date().toLocaleString()}`);
   const cookieHeader = (await cookies()).get("session")?.value;
   const ok = await verifyTokenServer(cookieHeader);
 
@@ -14,12 +15,18 @@ export async function GET(req: Request) {
   }
 
   const allPath = (await getAllBlogPath()) ?? [];
-  const output: Record<string, { name: string; url: string }[]> = {};
-
-  for (const folder of allPath) {
+  
+  const promises = allPath.map(async (folder) => {
     const urls = (await getProtectedFilesUrls(folder)) ?? [];
-    output[path.basename(folder)] = urls;
+    return [path.basename(folder), urls] as const;
+  });
+  
+  const results = await Promise.all(promises);
+  
+  const output: Record<string, { name: string; url: string }[]> = {};
+  for (const [name, urls] of results) {
+    output[name] = urls;
   }
-
+  console.log(`End: ${new Date().toLocaleString()}`);
   return NextResponse.json(output ?? {}, { status: 200 });
 }

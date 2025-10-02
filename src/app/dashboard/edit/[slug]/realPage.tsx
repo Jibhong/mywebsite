@@ -25,17 +25,26 @@ interface Metadata {
   date: number; // unix timestamp (seconds)
 }
 
-interface SlugProps {
-  slug: string;
+interface BlogDataProps {
+  markdown: string;
+  title: string;
+  description: string;
+  thumbnail: string;
 }
 
-export default function HomeContent({ slug }: SlugProps) {
+interface NewPageProps {
+  slug: string;
+  blogDataUrlPair: { name: string; url: string; }[]; // <-- use a prop name, not the interface directly
+}
+
+export default function HomeContent( { slug: slug, blogDataUrlPair: blogDataUrl }: NewPageProps ) {
 
   const [preview, setPreview] = useState<number>(0);
 
   const [formattedDateTime, setFormattedDateTime] = useState<string>();
   const [title, setTitle] = useState<string>("Title");
   const [description, setDescription] = useState<string>("Description");
+  const [thumbnail, setThumbnail] = useState<string>("/profile.png")
 
   const [markdown, setMarkdown]  = useState<string>("# Markdown");
 
@@ -133,22 +142,44 @@ export default function HomeContent({ slug }: SlugProps) {
     async function loadContent() {
       
       console.log(slug)
+      console.log(blogDataUrl)
 
-      const res_markdown = await fetch(await getBlobUrl(`/blog_page/${slug}/content.md`));
-      const res_meetadata = await fetch(await getBlobUrl(`/blog_page/${slug}/metadata.json`))
-      
-      if (!res_markdown.ok || !res_meetadata.ok) return notFound();
-      
-      const markdown = await res_markdown.text();
-      const metadata = await res_meetadata.json(); 
+      const found_markdown = blogDataUrl.find(file => file.name === "content.md");
+      let res_markdown = null;
 
-      setMarkdown(markdown);
-      setTitle(metadata.title);
-      setDescription(metadata.description);
+      if (found_markdown) {
+        res_markdown = await fetch(found_markdown.url);
+      }
+      const markdown = await res_markdown?.text();
+      if(markdown) setMarkdown(markdown);
+
+      
+      
+      
+      const found_metadata = blogDataUrl.find(file => file.name === "metadata.json");
+      if (found_metadata) {
+        const metadata = await (await fetch(found_metadata.url)).json();
+        if(metadata) setTitle(metadata.title);
+        if(metadata) setDescription(metadata.description);
+      }
+
+
+      // get preview.webp url
+      const thumbnail = blogDataUrl.find(file => file.name === "preview.webp")?.url;
+      if(thumbnail) setThumbnail(thumbnail);
+      
+
+
+
+
+      // setMarkdown(blogData.markdown);
+      // setTitle(blogData.title);
+      // setDescription(blogData.description);
+      // setThumbnail(blogData.thumbnail);
       
     }
     loadContent();
-    ;
+    
     
   }, []);
 
@@ -229,7 +260,7 @@ export default function HomeContent({ slug }: SlugProps) {
                     </div>
                   
                     <Image
-                      src={"/profile.png"}
+                      src={thumbnail}
                       alt="Profile image"
                       width={400}
                       height={400}

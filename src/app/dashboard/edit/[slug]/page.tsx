@@ -7,6 +7,7 @@ import path from "path";
 
 import NewPage from "./realPage"
 import { getAllBlogPath, listFolderPaths } from "@/lib/firebaseInterface";
+import { getProtectedBlog } from "@/lib/getProtectedBlog";
 
 export default async function Home({ params : promiseParam }: { params: { slug: string } }) {
 
@@ -33,7 +34,10 @@ export default async function Home({ params : promiseParam }: { params: { slug: 
     redirect("/dashboard");
   }
 
+
+  
+  
   return (
-    <NewPage slug={params.slug}/>
+    <NewPage slug={params.slug} blogDataUrlPair={await getProtectedBlog(params.slug)} />
   );
 }
