@@ -380,7 +380,7 @@ export default function HomeContent( { slug: slug, blogDataUrlPair: blogDataUrl 
                         height={450}
                         sizes="(max-width: 768px) 100vw, 800px"
                         loading="lazy"
-                        className="rounded-lg object-contain h-auto max-w-full w-auto mx-auto"
+                        className="rounded-lg object-contain h-auto max-w-full w-full mx-auto"
                       />
                     ),
                     hr: () => <hr className="my-8 border-t border-gray-300" />,

@@ -143,7 +143,7 @@ export default function Home({ params: promise_params }: { params: { slug: strin
                     height={450}
                     sizes="(max-width: 768px) 100vw, 800px"
                     loading="lazy"
-                    className="rounded-lg object-contain h-auto max-w-full w-auto mx-auto"
+                    className="rounded-lg object-contain h-auto max-w-full w-full mx-auto"
                   />
                 ),
 
