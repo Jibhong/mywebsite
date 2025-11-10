@@ -24,14 +24,15 @@ export default function Home({ params: promise_params }: { params: { slug: strin
     const params = await promise_params;
     
     const res_markdown = await fetch(await getBlobUrl(`/blog_page/${params.slug}/content.md`));
-    const res_meetadata = await fetch(await getBlobUrl(`/blog_page/${params.slug}/metadata.json`));
+    const res_metadata = await fetch(await getBlobUrl(`/blog_page/${params.slug}/metadata.json`));
 
-    if (!res_markdown.ok || !res_meetadata.ok) return notFound();
+    if (!res_markdown.ok || !res_metadata.ok) return notFound();
 
     setMarkdown(await res_markdown.text());
-    setMetadata(await res_meetadata.json()); 
+    const res_metadata_json = await res_metadata.json();
+    setMetadata(res_metadata_json); 
 
-    const metadata_timestamp = metadata.date * 1000; // convert to milliseconds
+    const metadata_timestamp = Number(res_metadata_json.date) * 1000; // convert to milliseconds
     const metadata_date = new Date(metadata_timestamp);
 
     const metadata_formattedDate = metadata_date.toLocaleDateString("en-US", {
