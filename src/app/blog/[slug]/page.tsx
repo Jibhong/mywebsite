@@ -1,3 +1,6 @@
+"use client";
+
+
 import Markdown from "react-markdown";
 import { notFound } from "next/navigation";
 
@@ -5,34 +8,48 @@ const BLOB = process.env.NEXT_PUBLIC_VERCEL_BLOB_URL;
 
 import { Header, Footer } from "@/lib/elements";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { getBlobUrl } from "@/lib/blobInterface";
 
-export default async function BlogPage({ params: promise_params }: { params: { slug: string } }) {
-  const params = await promise_params;
-
-  const res_markdown = await fetch(`${BLOB}/blog_pages/${params.slug}/content.md`);
-  const res_meetadata = await fetch(`${BLOB}/blog_pages/${params.slug}/metadata.json`)
-
-  if (!res_markdown.ok || !res_meetadata.ok) return notFound();
-
-  const markdown = await res_markdown.text();
-  const metadata = await res_meetadata.json(); 
-
-  const metadata_timestamp = metadata.date * 1000; // convert to milliseconds
-  const metadata_date = new Date(metadata_timestamp);
-
-  const metadata_formattedDate = metadata_date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "2-digit",
-    year: "numeric",
+export default function Home({ params: promise_params }: { params: { slug: string } }) {
+  const [markdown, setMarkdown]  = useState<string>("");
+  const [metadata, setMetadata] = useState<{ title: string; description: string; date: number }>({
+    title: "Loading...",
+    description: "",
+    date: 0,
   });
-  const metadata_formattedTime = metadata_date.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  }).replace(":", ".");
+  const [formattedDateTime, setFormattedDateTime] = useState<string>("");
+  
+  async function initPage() {
+    const params = await promise_params;
+    
+    const res_markdown = await fetch(await getBlobUrl(`/blog_page/${params.slug}/content.md`));
+    const res_meetadata = await fetch(await getBlobUrl(`/blog_page/${params.slug}/metadata.json`));
 
-  const formattedDateTime = `${metadata_formattedDate} (${metadata_formattedTime})`;
+    if (!res_markdown.ok || !res_meetadata.ok) return notFound();
 
+    setMarkdown(await res_markdown.text());
+    setMetadata(await res_meetadata.json()); 
+
+    const metadata_timestamp = metadata.date * 1000; // convert to milliseconds
+    const metadata_date = new Date(metadata_timestamp);
+
+    const metadata_formattedDate = metadata_date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+    });
+    const metadata_formattedTime = metadata_date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).replace(":", ".");
+
+    setFormattedDateTime(`${metadata_formattedDate} (${metadata_formattedTime})`);
+  }
+  useEffect(() => {
+    initPage();
+  }, []);
 //   const markdown = `
 
 // # 👋 Hello, I'm Jibhong
