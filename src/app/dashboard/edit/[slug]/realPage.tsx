@@ -376,8 +376,11 @@ export default function HomeContent( { slug: slug, blogDataUrlPair: blogDataUrl 
                       <Image
                         src={src as string}
                         alt={alt || "image"}
-                        fill
-                        className="rounded-lg my-6 object-cover"
+                        width={800}
+                        height={450}
+                        sizes="(max-width: 768px) 100vw, 800px"
+                        loading="lazy"
+                        className="rounded-lg object-contain h-auto max-w-full w-auto mx-auto"
                       />
                     ),
                     hr: () => <hr className="my-8 border-t border-gray-300" />,
