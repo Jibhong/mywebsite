@@ -10,6 +10,7 @@ import { Header, Footer } from "@/lib/elements";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { getBlobUrl } from "@/lib/blobInterface";
+import React from "react";
 
 export default function Home({ params: promise_params }: { params: { slug: string } }) {
   const [markdown, setMarkdown]  = useState<string>("");
@@ -135,17 +136,41 @@ export default function Home({ params: promise_params }: { params: { slug: strin
                     {children}
                   </pre>
                 ),
-                img: ({ src, alt }) => (
-                  <Image
-                    src={src as string}
-                    alt={alt || "image"}
-                    width={800}
-                    height={450}
-                    sizes="(max-width: 768px) 100vw, 800px"
-                    loading="lazy"
-                    className="rounded-lg object-contain h-auto max-w-full w-full mx-auto"
-                  />
-                ),
+                img: ({ src, alt }) => {
+                  const [isFetching, setIsFetching] = React.useState(true);
+
+                  return (
+                    <span className="relative block w-full">
+                      {/* .webp placeholder while fetching */}
+                      {isFetching && (
+                        <span
+                            className="block rounded-lg w-full bg-gray-300 animate-pulse"
+                            style={{
+                              // Reserve space with aspect ratio
+                              paddingTop: `${(450 / 800) * 100}%`, // height / width * 100
+                            }}
+                          />
+                      )}
+
+                      {/* Real image */}
+                      <Image
+                        src={src as string}
+                        alt={alt || "image"}
+                        width={800}
+                        height={450}
+                        sizes="(max-width: 768px) 100vw, 800px"
+                        loading="lazy"
+                        onLoad={() => setIsFetching(false)} // hide placeholder when fetched
+                        onError={() => setIsFetching(false)} // also hide on error
+                        className={`
+                          rounded-lg object-contain h-auto max-w-full w-full mx-auto
+                          transition-opacity duration-500
+                          ${isFetching ? "opacity-0 absolute" : "opacity-100 relative"}
+                        `}
+                      />
+                    </span>
+                  );
+                },
 
                 hr: () => <hr className="my-8 border-t border-gray-300" />,
               }}
