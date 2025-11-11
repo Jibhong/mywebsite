@@ -58,7 +58,7 @@ export default function Home() {
         <div className=" px-10 flex flex-col items-center mb-16">
           <div className="w-40 h-40 relative rounded-full overflow-hidden border-4 border-white shadow-lg">
             <Image
-              src="/profile.png"
+              src="/profile.webp"
               alt="User Profile"
               fill
               className="object-cover"

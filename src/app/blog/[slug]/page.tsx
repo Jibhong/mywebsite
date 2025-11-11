@@ -100,7 +100,7 @@ const MarkdownImage: React.FC<RMImgProps> = ({ src, alt, width, height, ...imgPr
           style={{ paddingTop: `${(h / w) * 100}%` }}
         />
       )}
-
+      <span className="rounded-lg overflow-hidden relative max-h-[80vh] flex justify-center items-center">
       <Image
         src={String(src)}
         alt={alt ?? ""}
@@ -111,10 +111,11 @@ const MarkdownImage: React.FC<RMImgProps> = ({ src, alt, width, height, ...imgPr
         onLoad={() => setIsFetching(false)}
         onError={() => setIsFetching(false)}
         className={
-          `rounded-lg object-contain h-auto max-w-full w-full mx-auto transition-opacity duration-500 ` +
+          `rounded-lg object-contain h-auto max-w-full w-full mx-auto max-h-[80vh] transition-opacity duration-500 ` +
           (isFetching ? "opacity-0 absolute" : "opacity-100 relative")
         }
       />
+      </span>
     </span>
   );
 };

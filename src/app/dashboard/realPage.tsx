@@ -45,7 +45,7 @@ function HomeContent() {
       const tempCards : Card[] = [];
       for (const directory in card_list) {
         const metadataUrl = card_list[directory].find((f: { name: string; url: string }) => f.name === "metadata.json")?.url || null;
-        const thumbnailUrl = card_list[directory].find((f: { name: string; url: string }) => f.name === "preview.webp")?.url || '/profile.png';
+        const thumbnailUrl = card_list[directory].find((f: { name: string; url: string }) => f.name === "preview.webp")?.url || '/loading.gif';
 
         if(!metadataUrl)continue;
         

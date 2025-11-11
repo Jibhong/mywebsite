@@ -44,7 +44,7 @@ export default function HomeContent( { slug: slug, blogDataUrlPair: blogDataUrl 
   const [formattedDateTime, setFormattedDateTime] = useState<string>();
   const [title, setTitle] = useState<string>("Title");
   const [description, setDescription] = useState<string>("Description");
-  const [thumbnail, setThumbnail] = useState<string>("/profile.png")
+  const [thumbnail, setThumbnail] = useState<string>("/loading.gif")
 
   const [markdown, setMarkdown]  = useState<string>("# Markdown");
 
