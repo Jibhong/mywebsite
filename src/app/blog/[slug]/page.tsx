@@ -7,10 +7,11 @@ import { notFound } from "next/navigation";
 const BLOB = process.env.NEXT_PUBLIC_VERCEL_BLOB_URL;
 
 import { Header, Footer } from "@/lib/elements";
-import Image from "next/image";
+import Image, { ImageProps } from "next/image";
 import { useEffect, useState } from "react";
 import { getBlobUrl } from "@/lib/blobInterface";
 import React from "react";
+
 
 export default function Home({ params: promise_params }: { params: { slug: string } }) {
   const [markdown, setMarkdown]  = useState<string>("");
@@ -70,6 +71,55 @@ export default function Home({ params: promise_params }: { params: { slug: strin
 
 
 // `
+type RMImgProps = React.ComponentPropsWithoutRef<"img">;
+
+const MarkdownImage: React.FC<RMImgProps> = ({ src, alt, width, height, ...imgProps }) => {
+  const [isFetching, setIsFetching] = React.useState(true);
+
+  // Turn width/height from string|number|undefined into a strict number
+  const parseDim = (v: string | number | undefined, fallback: number) => {
+    if (typeof v === "number") return v;
+    if (typeof v === "string") {
+      const n = parseInt(v, 10);
+      return Number.isNaN(n) ? fallback : n;
+    }
+    return fallback;
+  };
+
+  // defaults if not provided by markdown
+  const w = parseDim(width, 800);
+  const h = parseDim(height, 450);
+
+  if (!src) return null; // defensive
+
+  return (
+    <span className="relative block w-full" {...(imgProps)}>
+      {isFetching && (
+        <span
+          className="block rounded-lg w-full bg-gray-300 animate-pulse"
+          style={{ paddingTop: `${(h / w) * 100}%` }}
+        />
+      )}
+
+      <Image
+        src={String(src)}
+        alt={alt ?? ""}
+        width={w}
+        height={h}
+        sizes="(max-width: 768px) 100vw, 800px"
+        loading="lazy"
+        onLoad={() => setIsFetching(false)}
+        onError={() => setIsFetching(false)}
+        className={
+          `rounded-lg object-contain h-auto max-w-full w-full mx-auto transition-opacity duration-500 ` +
+          (isFetching ? "opacity-0 absolute" : "opacity-100 relative")
+        }
+      />
+    </span>
+  );
+};
+
+MarkdownImage.displayName = "MarkdownImage";
 
   return (
      <div className="pt-30 font-sans bg-orange-50 min-h-screen flex flex-col">
@@ -136,41 +186,8 @@ export default function Home({ params: promise_params }: { params: { slug: strin
                     {children}
                   </pre>
                 ),
-                img: ({ src, alt }) => {
-                  const [isFetching, setIsFetching] = React.useState(true);
+                img: MarkdownImage, // use uppercase component here
 
-                  return (
-                    <span className="relative block w-full">
-                      {/* .webp placeholder while fetching */}
-                      {isFetching && (
-                        <span
-                            className="block rounded-lg w-full bg-gray-300 animate-pulse"
-                            style={{
-                              // Reserve space with aspect ratio
-                              paddingTop: `${(450 / 800) * 100}%`, // height / width * 100
-                            }}
-                          />
-                      )}
-
-                      {/* Real image */}
-                      <Image
-                        src={src as string}
-                        alt={alt || "image"}
-                        width={800}
-                        height={450}
-                        sizes="(max-width: 768px) 100vw, 800px"
-                        loading="lazy"
-                        onLoad={() => setIsFetching(false)} // hide placeholder when fetched
-                        onError={() => setIsFetching(false)} // also hide on error
-                        className={`
-                          rounded-lg object-contain h-auto max-w-full w-full mx-auto
-                          transition-opacity duration-500
-                          ${isFetching ? "opacity-0 absolute" : "opacity-100 relative"}
-                        `}
-                      />
-                    </span>
-                  );
-                },
 
                 hr: () => <hr className="my-8 border-t border-gray-300" />,
               }}
