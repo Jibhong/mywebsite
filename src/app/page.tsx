@@ -74,7 +74,7 @@ export default function Home() {
           </div>
 
           <p className="mt-4 text-center text-gray-700 max-w-xl text-lg sm:text-xl">
-            {"I'm a self-taught developer and creative enthusiast. I love coding, 3D modeling, VFX, and exploring new technologies."}
+            {"Sawasdee Krub 🙏 Lorel ipsum doraemon? sit amen condensation asparagus. Why you are still reading."}
           </p>
 
           <div className="mt-6 flex space-x-4">
