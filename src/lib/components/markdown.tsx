@@ -130,7 +130,7 @@ const components: Components = {
     if (isBlock) {
       return (
         <code className="font-mono text-sm">
-          {"saass"}
+          {children}
         </code>
       );
     }
