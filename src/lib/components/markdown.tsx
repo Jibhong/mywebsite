@@ -114,7 +114,7 @@ const components: Components = {
   ),
 
   blockquote: ({ children }) => (
-    <blockquote className="rounded-sm border-l-6 border-amber-400 pl-4 italic text-gray-700 bg-amber-100 py-2">
+    <blockquote className="rounded-sm border-l-6 border-amber-400 pl-4 italic text-gray-700 bg-amber-100 py-2 mb-6">
       <div className="[&>p]:mb-0">
         {children}
       </div>
