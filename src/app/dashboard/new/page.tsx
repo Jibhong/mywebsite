@@ -8,16 +8,9 @@ import { getBlogUrl } from "@/lib/newBlog";
 
 export default async function Home() {
 
-  const cookieHeader = (await cookies()).get("session")?.value
-
-  const ok = await verifyTokenServer(cookieHeader);
-
   const location = await getBlogUrl();
+  
+  console.log("new blog path created:", location);
 
-  if (!ok) {
-    redirect("/login");
-  }
-  else {
-    redirect(`/dashboard/edit/${location}`);
-  }
+  redirect(`/dashboard/edit/${location}`);
 }

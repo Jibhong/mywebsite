@@ -1,22 +1,24 @@
-import jwt from "jsonwebtoken";
+// import jwt from "jsonwebtoken";
 
-type TokenPayload = {
-  email?: string;
-  iat?: number;
-  exp?: number;
-};
+import { jwtVerify } from "jose";
 
-export async function verifyTokenServer(token?: string | null){
-    if (!token) return false;
-    const jwtSecret = process.env.JWT_SECRET;
-    if(!jwtSecret) return false;
+export async function verifyTokenServer(token?: string | null) {
+  if (!token) return false;
 
-    try {
-        const payload = jwt.verify(token, jwtSecret) as TokenPayload;
-        if (payload.email !== process.env.EMAIL) return false;
-        return true;
-    } catch (err) {
-        // verification failed (invalid signature, expired, etc.)
-        return false;
+  const secret = process.env.JWT_SECRET;
+  if (!secret) return false;
+
+  try {
+    const secretKey = new TextEncoder().encode(secret);
+
+    const { payload } = await jwtVerify(token, secretKey);
+
+    if (payload.email !== process.env.EMAIL) {
+      return false;
     }
+
+    return true;
+  } catch {
+    return false;
+  }
 }

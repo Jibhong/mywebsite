@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { verifyTokenServer } from "@/lib/tokenAuth.server";
 import { getAllBlogPath } from "@/lib/firebaseInterface";
 import { getProtectedFilesUrls } from "@/lib/firebaseInterface";
