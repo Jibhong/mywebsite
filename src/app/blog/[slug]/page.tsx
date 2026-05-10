@@ -6,8 +6,7 @@ import { notFound } from "next/navigation";
 
 const BLOB = process.env.NEXT_PUBLIC_VERCEL_BLOB_URL;
 
-import { Header, Footer } from "@/lib/elements";
-import Image from "next/image";
+import { Header, Footer } from "@/lib/components/elements";
 import { useEffect, useState } from "react";
 import { getBlobUrl } from "@/lib/blobInterface";
 
@@ -23,8 +22,8 @@ export default function Home({ params: promise_params }: { params: { slug: strin
   async function initPage() {
     const params = await promise_params;
     
-    const res_markdown = await fetch(await getBlobUrl(`/blog_page/${params.slug}/content.md`));
-    const res_meetadata = await fetch(await getBlobUrl(`/blog_page/${params.slug}/metadata.json`));
+    const res_markdown = await fetch(getBlobUrl(`/blog_page/${params.slug}/content.md`));
+    const res_metadata = await fetch(getBlobUrl(`/blog_page/${params.slug}/metadata.json`));
 
     if (!res_markdown.ok || !res_meetadata.ok) return notFound();
 

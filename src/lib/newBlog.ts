@@ -27,7 +27,7 @@ async function generateUniqueFolder(): Promise<string> {
 /**
  * Create JSON file inside a new unique folder in /blog_page_protected
  */
-export async function getBlogUrl(): Promise<string> {
+export async function getNewBlogUrl(): Promise<string> {
   const bucket = await getBucket();
   const folderName = await generateUniqueFolder();
   const folderPath = `blog_page_protected/${folderName}/`;

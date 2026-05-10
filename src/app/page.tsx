@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link"
-import { Header, Footer, SearchBar } from "@/lib/elements";
+import { Header, Footer, SearchBar } from "@/lib/components/elements";
 import { useEffect, useState } from "react";
 import { Suspense } from "react";
 import { getBlobUrl } from "@/lib/blobInterface";

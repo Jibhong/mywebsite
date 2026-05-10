@@ -8,7 +8,7 @@ export async function POST(req: Request) {
   const { email, password } = await req.json();
   // Only allow the configured admin email & password
   if (email !== process.env.EMAIL || password !== process.env.PASSWORD) {
-      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+    return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
 
   await dbRemoveString("TOKEN");
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
   });
 
   // Send OTP email
-  await transporter.sendMail({
+  transporter.sendMail({
     from: `"Admin Login" <${process.env.SMTP_USER}>`,
     to: process.env.EMAIL,
     subject: "Your OTP Code",

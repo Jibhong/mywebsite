@@ -1,4 +1,6 @@
-import jwt from "jsonwebtoken";
+// @/lib/tokenAuth.server.ts
+
+// import jwt from "jsonwebtoken";
 
 type TokenPayload = {
   email?: string;
@@ -6,17 +8,24 @@ type TokenPayload = {
   exp?: number;
 };
 
-export async function verifyTokenServer(token?: string | null){
-    if (!token) return false;
-    const jwtSecret = process.env.JWT_SECRET;
-    if(!jwtSecret) return false;
+export async function verifyTokenServer(token?: string | null) : Promise<boolean | string> {
+  
+  if (!token) return false;
 
-    try {
-        const payload = jwt.verify(token, jwtSecret) as TokenPayload;
-        if (payload.email !== process.env.EMAIL) return false;
-        return true;
-    } catch (err) {
-        // verification failed (invalid signature, expired, etc.)
-        return false;
+  const secret = process.env.JWT_SECRET;
+  if (!secret) return false;
+
+  try {
+    const secretKey = new TextEncoder().encode(secret);
+
+    const { payload } = await jwtVerify(token, secretKey);
+
+    if (payload.email !== process.env.EMAIL || typeof payload.email !== "string") {
+      return false;
     }
+
+    return payload.email;
+  } catch {
+    return false;
+  }
 }

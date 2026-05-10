@@ -8,11 +8,13 @@ import { useRef } from "react";
 
 const BLOB = process.env.NEXT_PUBLIC_VERCEL_BLOB_URL;
 
-import { Header, Footer } from "@/lib/elements";
+import { Header, Footer } from "@/lib/components/elements";
 import Image from "next/image";
 
 import { useEffect, useState } from "react";
-import { HeaderDashboard } from "@/lib/element.dashboard";
+import { HeaderDashboard } from "@/lib/components/element.dashboard";
+import MarkdownComponent from "@/lib/components/markdown";
+
 import { upload } from "@vercel/blob/client";
 
 import { getBlobUrl } from "@/lib/blobInterface";

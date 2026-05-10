@@ -1,7 +1,5 @@
-import { verifyTokenServer } from "@/lib/tokenAuth.server";
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
-import { getBlogUrl } from "@/lib/newBlog";
+import { getNewBlogUrl } from "@/lib/newBlog";
 
 
 
@@ -12,12 +10,9 @@ export default async function Home() {
 
   const ok = await verifyTokenServer(cookieHeader);
 
-  const location = await getBlogUrl();
+  const location = await getNewBlogUrl();
+  
+  console.log("new blog path created:", location);
 
-  if (!ok) {
-    redirect("/login");
-  }
-  else {
-    redirect(`/dashboard/edit/${location}`);
-  }
+  redirect(`/dashboard/edit/${location}`);
 }

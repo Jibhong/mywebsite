@@ -6,7 +6,7 @@ import { Bucket } from "@google-cloud/storage";
 
 let bucket: Bucket;
 
-async function initFirebase() {
+export async function initFirebase() {
   if (!admin.apps.length) {
     console.log("Login to firebase service account");
     const projectId = process.env.FIREBASE_PROJECT_ID;
@@ -75,10 +75,10 @@ export async function getProtectedFilesUrls(folderPath: string) {
       const name = path.basename(file.name);
       const cached = urlCache[file.name];
       if (cached && cached.expires > now) return { name, url: cached.url };
-      console.log("Fetching signed url");
+      // console.log("Fetching signed url");
       const [url] = await file.getSignedUrl({
         action: "read",
-        expires: now + 60 * 60 * 1000,
+        expires: now + 60 * 60 * 1000, // 1 minute expiration
       });
 
       urlCache[file.name] = { name, url, expires: now + 60 * 60 * 1000 };
