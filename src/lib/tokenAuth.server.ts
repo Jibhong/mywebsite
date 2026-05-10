@@ -2,6 +2,8 @@
 
 // import jwt from "jsonwebtoken";
 
+import { jwtVerify } from "jose";
+
 type TokenPayload = {
   email?: string;
   iat?: number;

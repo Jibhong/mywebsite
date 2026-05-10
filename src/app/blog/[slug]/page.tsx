@@ -3,12 +3,14 @@
 
 import Markdown from "react-markdown";
 import { notFound } from "next/navigation";
+import Image from "next/image";
 
 const BLOB = process.env.NEXT_PUBLIC_VERCEL_BLOB_URL;
 
 import { Header, Footer } from "@/lib/components/elements";
 import { useEffect, useState } from "react";
 import { getBlobUrl } from "@/lib/blobInterface";
+import MarkdownComponent from "@/lib/components/markdown";
 
 export default function Home({ params: promise_params }: { params: { slug: string } }) {
   const [markdown, setMarkdown]  = useState<string>("");
@@ -25,10 +27,10 @@ export default function Home({ params: promise_params }: { params: { slug: strin
     const res_markdown = await fetch(getBlobUrl(`/blog_page/${params.slug}/content.md`));
     const res_metadata = await fetch(getBlobUrl(`/blog_page/${params.slug}/metadata.json`));
 
-    if (!res_markdown.ok || !res_meetadata.ok) return notFound();
+    if (!res_markdown.ok || !res_metadata.ok) return notFound();
 
     setMarkdown(await res_markdown.text());
-    setMetadata(await res_meetadata.json()); 
+    setMetadata(await res_metadata.json()); 
 
     const metadata_timestamp = metadata.date * 1000; // convert to milliseconds
     const metadata_date = new Date(metadata_timestamp);
@@ -89,67 +91,7 @@ export default function Home({ params: promise_params }: { params: { slug: strin
           </div>
 
           <article className="mb-20 break-words text-red-500 prose prose-lg prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-800 prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 prose-code:bg-gray-200 prose-code:px-1 prose-code:rounded prose-blockquote:border-l-4 prose-blockquote:border-blue-400 prose-blockquote:bg-blue-50 prose-blockquote:p-4 prose-li:marker:text-purple-600">
-            <Markdown
-              components={{
-                h1: ({ children }) => (
-                  <h1 className="text-4xl font-extrabold text-gray-900 mb-6">{children}</h1>
-                ),
-                h2: ({ children }) => (
-                  <h2 className="text-3xl font-bold text-gray-800 mt-10 mb-4">{children}</h2>
-                ),
-                h3: ({ children }) => (
-                  <h3 className="text-2xl font-semibold text-gray-700 mt-8 mb-3">{children}</h3>
-                ),
-                p: ({ children }) => (
-                  <p className="text-lg leading-relaxed text-gray-800 mb-4">{children}</p>
-                ),
-                a: ({ children, href }) => (
-                  <a
-                    href={href}
-                    className="text-blue-600 hover:text-blue-800 underline underline-offset-2"
-                  >
-                    {children}
-                  </a>
-                ),
-                ul: ({ children }) => (
-                  <ul className="list-disc pl-6 space-y-2">{children}</ul>
-                ),
-                ol: ({ children }) => (
-                  <ol className="list-decimal pl-6 space-y-2">{children}</ol>
-                ),
-                li: ({ children }) => <li className="text-gray-800">{children}</li>,
-                blockquote: ({ children }) => (
-                  <blockquote className="border-l-4 border-blue-400 pl-4 italic text-gray-700 bg-blue-50 py-2">
-                    {children}
-                  </blockquote>
-                ),
-                code: ({ children }) => (
-                  <code className="bg-gray-200 px-2 py-0.5 rounded text-sm font-mono text-pink-600">
-                    {children}
-                  </code>
-                ),
-                pre: ({ children }) => (
-                  <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto mb-6">
-                    {children}
-                  </pre>
-                ),
-                img: ({ src, alt }) => (
-                  <Image
-                    src={src as string}
-                    alt={alt || "image"}
-                    width={800}
-                    height={450}
-                    sizes="(max-width: 768px) 100vw, 800px"
-                    loading="lazy"
-                    className="rounded-lg object-contain h-auto max-w-full w-auto mx-auto"
-                  />
-                ),
-
-                hr: () => <hr className="my-8 border-t border-gray-300" />,
-              }}
-            >
-              {markdown}
-            </Markdown>
+            <MarkdownComponent markdown={markdown} />
           </article>
         </div>
       </main>

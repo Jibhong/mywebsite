@@ -6,6 +6,8 @@ import path from "path";
 import NewPage from "./realPage"
 import { getAllBlogPath, listFolderPaths } from "@/lib/firebaseInterface";
 import { getProtectedBlog } from "@/lib/getProtectedBlog";
+import { verifyTokenServer } from "@/lib/tokenAuth.server";
+import { cookies } from "next/headers";
 
 export default async function Home({ params : promiseParam }: { params: { slug: string } }) {
 
