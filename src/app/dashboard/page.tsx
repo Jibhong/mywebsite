@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { HeaderDashboard } from "@/lib/components/element.dashboard";
-import logInToFirebase from "@/lib/tokenFetcher.client";
 
 import { ref, list, getDownloadURL } from "firebase/storage";
 import { singletonFirebaseStorage } from "@/lib/singleton/firebaseAuth.client";
