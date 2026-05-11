@@ -29,7 +29,7 @@ export async function POST(req: Request) {
   });
 
   // Send OTP email
-  transporter.sendMail({
+  await transporter.sendMail({
     from: `"Admin Login" <${process.env.SMTP_USER}>`,
     to: process.env.EMAIL,
     subject: "Your OTP Code",

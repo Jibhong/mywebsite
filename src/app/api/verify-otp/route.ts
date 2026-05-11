@@ -7,7 +7,10 @@ import jwt from 'jsonwebtoken';
 
 export async function POST(req: Request) {
   const { otp } = await req.json();
-    console.log(`${otp} == ${ await getCurrentOtp()}`)
+  if(await getCurrentOtp()=== null || !otp || otp===undefined || otp===null || typeof otp !== "string" || otp.trim() === "") {
+    return NextResponse.json({ error: "Invalid OTP" }, { status: 400 });
+  }
+  console.log(`${otp} == ${ await getCurrentOtp()}`)
   if (otp === await getCurrentOtp()) {
     dbRemoveString("OTP");
     const email = process.env.EMAIL;
