@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Header, Footer, SearchBar } from "@/lib/components/elements";
 import { useEffect, useState } from "react";
 import { Suspense } from "react";
-import { getBlobUrl } from "@/lib/blobInterface";
+import { getBlobUrl } from "@/lib/blogURLPhraser";
 
 
 const BLOB = process.env.NEXT_PUBLIC_VERCEL_BLOB_URL;

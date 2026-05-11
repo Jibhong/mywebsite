@@ -1,9 +1,8 @@
 import { cookies } from 'next/headers';
 import { verifyTokenServer } from '@/lib/tokenAuth.server';
-import { NextRequest, NextResponse } from 'next/server';
-import admin from "firebase-admin";
-import { init } from 'next/dist/compiled/webpack/webpack';
-import { initFirebase } from "@/lib/firebaseInterface";
+import { NextResponse } from 'next/server';
+import { getAuth } from "firebase-admin/auth";
+import { initFirebase } from "@/lib/firebaseInterface.server";
 
 interface TokenAndExpiry {
   token: string;
@@ -11,7 +10,7 @@ interface TokenAndExpiry {
 }
 
 export async function GET() {
-  await initFirebase();
+  initFirebase();
   const cookieHeader = (await cookies()).get("session")?.value;
   const ok = await verifyTokenServer(cookieHeader);
   const userEmail = ok;
@@ -20,18 +19,20 @@ export async function GET() {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
   const tokenRes = await getFirebaseToken(userEmail);
-  if(!tokenRes) {
+  if (!tokenRes) {
     return NextResponse.json({ error: "Failed to generate token" }, { status: 500 });
   }
   return NextResponse.json({ token: tokenRes.token, expiresAt: tokenRes.expiresAt }, { status: 200 });
 }
 
 async function getFirebaseToken(uuid: string | null = null): Promise<TokenAndExpiry | null> {
-  if(!uuid) return null;
+  if (!uuid) return null;
+  const auth = getAuth();
   const newExpiresTime = Date.now() + 15 * 60 * 1000;
-  const token = await admin.auth().createCustomToken(uuid, {
+  const token = await auth.createCustomToken(uuid, {
     role: "view-protected-blog",
     expiresAt: newExpiresTime,
   });
   return { token, expiresAt: newExpiresTime };
 }
+

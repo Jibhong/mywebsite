@@ -4,13 +4,16 @@ import Fuse from "fuse.js";
 import Image from "next/image";
 import Link from "next/link"
 import { Header, Footer, SearchBar, BigSpinner } from "@/lib/components/elements";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { HeaderDashboard } from "@/lib/components/element.dashboard";
 
 import { ref, list, getDownloadURL } from "firebase/storage";
 import { singletonFirebaseStorage } from "@/lib/singleton/firebaseAuth.client";
+import { log } from "console";
+import { logInToFirebase } from "@/lib/tokenFetcher.client";
+import { AppReadyContext } from "./layout";
 
 
 const BLOB = process.env.NEXT_PUBLIC_VERCEL_BLOB_URL;
@@ -25,13 +28,15 @@ interface Card {
 }
 
 function HomeContent() {
+  const loggedInToFirebase = useContext(AppReadyContext);
 
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("search") || "";
-
+  
   const [cards, setCards] = useState<Card[]>([]);
 
   useEffect(() => {
+    if(!loggedInToFirebase) return; // wait for firebase login to complete
     async function fetchCards(folderPath: string) {
       const listRef = ref(singletonFirebaseStorage, folderPath);
 
@@ -81,7 +86,7 @@ function HomeContent() {
 
     fetchCards("blog_page/");
     fetchCards("blog_page_protected/");
-  }, []);
+  }, [loggedInToFirebase]); // run when firebase login is done
 
 
   async function refreshSearch(query: string) {

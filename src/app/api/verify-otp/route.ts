@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { getCurrentOtp } from "@/app/api/login/route";
-import { dbRemoveString } from "@/lib/dbHandler";
 import { serialize } from "cookie";
 import jwt from 'jsonwebtoken';
+import { dbRemoveString } from "@/lib/firestoreInterface.server";
 
 
 export async function POST(req: Request) {
@@ -22,7 +22,6 @@ export async function POST(req: Request) {
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         path: "/",
-        // keep in sync with token lifetime; here 1 day (in seconds)
         maxAge: 60 * 60 * 24,
     });
     return NextResponse.json(

@@ -9,7 +9,7 @@ const BLOB = process.env.NEXT_PUBLIC_VERCEL_BLOB_URL;
 
 import { Header, Footer } from "@/lib/components/elements";
 import { useEffect, useState } from "react";
-import { getBlobUrl } from "@/lib/blobInterface";
+import { getBlobUrl } from "@/lib/blogURLPhraser";
 import MarkdownComponent from "@/lib/components/markdown";
 
 export default function Home({ params: promise_params }: { params: { slug: string } }) {

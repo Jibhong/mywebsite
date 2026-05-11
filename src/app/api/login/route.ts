@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
-import { dbGetString, dbRemoveString, dbSetString } from "@/lib/dbHandler";
-
+import { dbSetString, dbGetString, dbRemoveString } from "@/lib/firestoreInterface.server";
 
 export async function POST(req: Request) {
   const { email, password } = await req.json();
@@ -10,8 +9,6 @@ export async function POST(req: Request) {
   if (email !== process.env.EMAIL || password !== process.env.PASSWORD) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
-
-  await dbRemoveString("TOKEN");
 
   // Generate OTP
   const currentOtp = await generateOtp();
@@ -42,7 +39,7 @@ async function generateOtp(digits = 6) {
   
   const bytes = crypto.randomBytes(4).readUInt32BE() % (10 ** digits);
   const newOtp =  bytes.toString().padStart(digits, "0");
-  await dbSetString("OTP", newOtp);
+  await dbSetString("OTP", newOtp, Date.now() + 5 * 60 * 1000); // Expires in 5 minutes
   return newOtp;
 
 }

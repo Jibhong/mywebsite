@@ -1,4 +1,4 @@
-import { getBucket } from "@/lib/firebaseInterface"; // your firebase.ts
+import { getBucket } from "@/lib/firebaseInterface.server"; // your firebase.ts
 
 
 /**

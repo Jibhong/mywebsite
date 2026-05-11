@@ -6,7 +6,7 @@ import { signInWithCustomToken } from "firebase/auth";
 import { singletonFirebaseAuth } from "@/lib/singleton/firebaseAuth.client";
 
 export async function logInToFirebase() {
-  
+  console.log("Attempting to log in to Firebase...");
   async function fetchToken() {
     const storedExpiry = localStorage.getItem("tokenExpiry");
     if (storedExpiry && parseInt(storedExpiry) > Date.now()) return;
@@ -25,8 +25,8 @@ export async function logInToFirebase() {
     console.log("signing in to firebase with token:", "**HIDDEN**");
     await signInWithCustomToken(singletonFirebaseAuth, token);
   }
-  fetchToken();
-  signInWithToken();
+  await fetchToken();
+  await signInWithToken();
 
-  return null;
+  return;
 }
