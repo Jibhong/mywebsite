@@ -3,15 +3,14 @@
 
 import Markdown from "react-markdown";
 import { notFound } from "next/navigation";
+import Image from "next/image";
 
 const BLOB = process.env.NEXT_PUBLIC_VERCEL_BLOB_URL;
 
-import { Header, Footer } from "@/lib/elements";
+import { Header, Footer } from "@/lib/components/elements";
 import { useEffect, useState } from "react";
 import { getBlobUrl } from "@/lib/blobInterface";
 import MarkdownComponent from "@/lib/components/markdown";
-import React from "react";
-
 
 export default function Home({ params: promise_params }: { params: { slug: string } }) {
   const [markdown, setMarkdown]  = useState<string>("");
@@ -25,8 +24,8 @@ export default function Home({ params: promise_params }: { params: { slug: strin
   async function initPage() {
     const params = await promise_params;
     
-    const res_markdown = await fetch(await getBlobUrl(`/blog_page/${params.slug}/content.md`));
-    const res_metadata = await fetch(await getBlobUrl(`/blog_page/${params.slug}/metadata.json`));
+    const res_markdown = await fetch(getBlobUrl(`/blog_page/${params.slug}/content.md`));
+    const res_metadata = await fetch(getBlobUrl(`/blog_page/${params.slug}/metadata.json`));
 
     if (!res_markdown.ok || !res_metadata.ok) return notFound();
 
@@ -90,7 +89,10 @@ export default function Home({ params: promise_params }: { params: { slug: strin
             </h2>
             <hr className="my-4 border-t border-gray-600" />
           </div>
+
+          <article className="mb-20 break-words text-red-500 prose prose-lg prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-800 prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 prose-code:bg-gray-200 prose-code:px-1 prose-code:rounded prose-blockquote:border-l-4 prose-blockquote:border-blue-400 prose-blockquote:bg-blue-50 prose-blockquote:p-4 prose-li:marker:text-purple-600">
             <MarkdownComponent markdown={markdown} />
+          </article>
         </div>
       </main>
 

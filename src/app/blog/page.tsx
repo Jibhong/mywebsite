@@ -3,7 +3,7 @@ import Fuse from "fuse.js";
 
 import Image from "next/image";
 import Link from "next/link"
-import { Header, Footer, SearchBar } from "@/lib/elements";
+import { Header, Footer, SearchBar } from "@/lib/components/elements";
 import { useEffect, useState } from "react";
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
@@ -35,7 +35,7 @@ function HomeContent() {
 
   useEffect(() => {
     async function fetchCards() {
-      const res = await fetch(await getBlobUrl("/blog_page/index.json"));
+      const res = await fetch(getBlobUrl("/blog_page/index.json"));
       const list = await res.json();
       setCardList(list)
       console.log(list)
@@ -43,7 +43,7 @@ function HomeContent() {
       setCards(Array(list.length).fill(null));
       for(let i=0; i<list.length; i++){
         console.log(i);
-        const res = await fetch(await getBlobUrl("/blog_page/"+list[i]+"/metadata.json"));
+        const res = await fetch(getBlobUrl("/blog_page/"+list[i]+"/metadata.json"));
         const card = await res.json(); 
 
         tempCards.push({ ...card, path: list[i], thumbnail: getBlobUrl("/blog_page/"+list[i]+"/preview.webp"), link: "blog/"+list[i]}); // append multiple times to temp array

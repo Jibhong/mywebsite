@@ -2,7 +2,8 @@
 
 import { jwtVerify } from "jose";
 
-export async function verifyTokenServer(token?: string | null) {
+export async function verifyTokenServer(token?: string | null) : Promise<boolean | string> {
+  
   if (!token) return false;
 
   const secret = process.env.JWT_SECRET;
@@ -13,11 +14,11 @@ export async function verifyTokenServer(token?: string | null) {
 
     const { payload } = await jwtVerify(token, secretKey);
 
-    if (payload.email !== process.env.EMAIL) {
+    if (payload.email !== process.env.EMAIL || typeof payload.email !== "string") {
       return false;
     }
 
-    return true;
+    return payload.email;
   } catch {
     return false;
   }
