@@ -30,9 +30,10 @@ export default function Home({ params: promise_params }: { params: { slug: strin
     if (!res_markdown.ok || !res_metadata.ok) return notFound();
 
     setMarkdown(await res_markdown.text());
-    setMetadata(await res_metadata.json()); 
+    const res_metadata_json = await res_metadata.json();
+    setMetadata(res_metadata_json); 
 
-    const metadata_timestamp = metadata.date * 1000; // convert to milliseconds
+    const metadata_timestamp = Number(res_metadata_json.date) * 1000; // convert to milliseconds
     const metadata_date = new Date(metadata_timestamp);
 
     const metadata_formattedDate = metadata_date.toLocaleDateString("en-US", {
@@ -69,7 +70,6 @@ export default function Home({ params: promise_params }: { params: { slug: strin
 
 
 // `
-
   return (
      <div className="pt-30 font-sans bg-orange-50 min-h-screen flex flex-col">
       <Header />

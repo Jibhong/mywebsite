@@ -1,14 +1,6 @@
-// @/lib/tokenAuth.server.ts
-
 // import jwt from "jsonwebtoken";
 
 import { jwtVerify } from "jose";
-
-type TokenPayload = {
-  email?: string;
-  iat?: number;
-  exp?: number;
-};
 
 export async function verifyTokenServer(token?: string | null) : Promise<boolean | string> {
   

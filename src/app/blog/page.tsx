@@ -117,7 +117,7 @@ function HomeContent() {
                           <h2 className="line-clamp-2 sm:line-clamp-1 text-xl font-bold mb-1 text-gray-700">{data?.title ?? ""}</h2>
                           <p className="line-clamp-3 xl:line-clamp-5 text-gray-700 mb-1">{data?.description ?? ""}</p>
                           <p className="text-xs italic text-gray-700 mt-auto">
-                            {new Date(data?.date ?? 0 * 1000).toLocaleDateString("en-US", {
+                            {new Date((data?.date ?? 0) * 1000).toLocaleDateString("en-US", {
                               month: "short",
                               day: "2-digit",
                               year: "numeric",
