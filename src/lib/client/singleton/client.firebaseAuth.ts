@@ -1,5 +1,6 @@
 // lib/singleton/firebaseAuth.client.ts
 
+import { getFirestore } from "firebase/firestore";
 import { initializeApp, getApps } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
@@ -22,3 +23,4 @@ const app =
 
 export const singletonFirebaseAuth = getAuth(app);
 export const singletonFirebaseStorage = getStorage(app);
+export const singletonFirestore = getFirestore(app, "portfolio-website-firestore");

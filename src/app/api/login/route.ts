@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
-import { dbSetString, dbGetString, dbRemoveString } from "@/lib/firestoreInterface.server";
+import { dbSetOtp } from "@/lib/server/server.firestoreInterface";
 
 export async function POST(req: Request) {
+  
   const { email, password } = await req.json();
   // Only allow the configured admin email & password
   if (email !== process.env.EMAIL || password !== process.env.PASSWORD) {
@@ -11,9 +12,8 @@ export async function POST(req: Request) {
   }
 
   // Generate OTP
-  const currentOtp = await generateOtp();
-  console.log(`OTP: ${currentOtp}`)
-
+  const { otp, challengeId } = await generateOtp(email);
+  console.log("OTP:", otp);
   // Configure mailer
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
@@ -30,24 +30,21 @@ export async function POST(req: Request) {
     from: `"Admin Login" <${process.env.SMTP_USER}>`,
     to: process.env.EMAIL,
     subject: "Your OTP Code",
-    text: `Your OTP is ${currentOtp}`,
+    text: `Your OTP is ${otp}`,
   });
-  return NextResponse.json({ message: "OTP sent" });
+
+  return NextResponse.json(
+    { message: "OTP sent", challengeId },
+    { status: 200 }
+  );
 }
 
-async function generateOtp(digits = 6) {
-  
+async function generateOtp(userId:string, digits = 6) {
+
   const bytes = crypto.randomBytes(4).readUInt32BE() % (10 ** digits);
-  const newOtp =  bytes.toString().padStart(digits, "0");
-  await dbSetString("OTP", newOtp, Date.now() + 5 * 60 * 1000); // Expires in 5 minutes
-  return newOtp;
+  const otp = bytes.toString().padStart(digits, "0");
+  const challengeId: string = crypto.randomUUID();
+  await dbSetOtp(userId, challengeId, otp, Date.now() + 5 * 60 * 1000); // Expires in 5 minutes
+  return { otp, challengeId };
 
-}
-
-export async function getCurrentOtp() {
-  try {
-    return await dbGetString("OTP");
-  } catch {
-    return null;
-  }
 }

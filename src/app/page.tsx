@@ -2,13 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link"
-import { Header, Footer, SearchBar } from "@/lib/components/elements";
+import { Header, Footer, SearchBar } from "@/lib/client/components/elements";
 import { useEffect, useState } from "react";
 import { Suspense } from "react";
-import { getBlobUrl } from "@/lib/blogURLPhraser";
+import { getBlogUrl } from "@/lib/client/client.blogURLPhraser";
+import { singletonFirestore } from "@/lib/client/singleton/client.firebaseAuth";
+import { collection, getDocs } from "firebase/firestore";
 
 
-const BLOB = process.env.NEXT_PUBLIC_VERCEL_BLOB_URL;
 
 interface Card {
   title: string;
@@ -24,28 +25,39 @@ export default function Home() {
 
 
   useEffect(() => {
-
     async function fetchCards() {
-      const res = await fetch(await getBlobUrl("/blog_page/index.json"));
-      const card_list = await res.json();
-      console.log(card_list);
-      const tempCards: Card[] = [];
-      setCards(Array(Math.min(6, card_list.length)).fill(null));
-      for (let i = 0; i < Math.min(6, card_list.length); i++) {
-        console.log(i);
-        const res = await fetch(await getBlobUrl("/blog_page/" + card_list[i] + "/metadata.json"));
+      const snapshot = await getDocs(collection(singletonFirestore, "public-blog-index"));
+
+      const folderPaths = snapshot.docs.map((doc) => doc.id);
+
+      setCards(Array(Math.min(6, folderPaths.length)).fill(null));
+
+      for (let i = 0; i < Math.min(6, folderPaths.length); i++) {
+        const folderPath = folderPaths[i];
+
+        const res = await fetch(
+          getBlogUrl(`/blog_page/${folderPath}/metadata.json`)
+        );
+
         const card = await res.json();
-        console.log(card);
-        tempCards.push({ ...card, path: card_list[i], thumbnail: getBlobUrl("/blog_page/" + card_list[i] + "/preview.webp"), link: "blog/" + card_list[i] }); // append multiple times to temp array
-        setCards(prev => {
+
+        const cardData: Card = {
+          ...card,
+          path: folderPath,
+          thumbnail: getBlogUrl(
+            `/blog_page/${folderPath}/preview.webp`
+          ),
+          link: `blog/${folderPath}`,
+        };
+
+        setCards((prev) => {
           const next = [...prev];
-          next[i] = { ...card, path: card_list[i], thumbnail: getBlobUrl("/blog_page/" + card_list[i] + "/preview.webp"), link: "blog/" + card_list[i] };
+          next[i] = cardData;
           return next;
         });
-
       }
-      // setCards(tempCards);
     }
+
     fetchCards();
   }, []);
 
@@ -98,12 +110,12 @@ export default function Home() {
           PROJECTS
         </div>
         <Suspense fallback={<div>Loading search...</div>}>
-          <SearchBar />
+          <SearchBar redirect="blog"/>
         </Suspense>
 
         <div id="card_container" className="px-[10%] portrait:px-[5%] max-w-[2000px] mx-auto grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
           {cards.length > 0 ? (
-            cards.map((data, index) => 
+            cards.map((data, index) =>
               <div key={index} className="relative animate-card-in">
                 <Link href={data?.link ?? "#"} key={index} className="flex justify-between  card-background gap-4 transition-opacity duration-200">
                   <div>
@@ -112,8 +124,9 @@ export default function Home() {
                   </div>
 
                   <Image
+                    // unoptimized
+                    alt="Blog Preview Image"
                     src={data?.thumbnail ?? "/loading.gif"}
-                    alt="Repo image"
                     width={400}
                     height={400}
                     className="w-30 h-30 xl:w-40 xl:h-40 object-cover rounded-2xl justify-self-end"

@@ -1,15 +1,16 @@
 import { cookies } from 'next/headers';
-import { verifyTokenServer } from '@/lib/tokenAuth.server';
+import { verifyTokenServer } from '@/lib/server/server.tokenAuth';
 import { NextResponse } from 'next/server';
 import { getAuth } from "firebase-admin/auth";
-import { initFirebase } from "@/lib/firebaseInterface.server";
+import { initFirebase } from "@/lib/server/server.firebaseInterface";
 
 interface TokenAndExpiry {
   token: string;
   expiresAt: number;
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+  
   initFirebase();
   const cookieHeader = (await cookies()).get("session")?.value;
   const ok = await verifyTokenServer(cookieHeader);
@@ -30,9 +31,18 @@ async function getFirebaseToken(uuid: string | null = null): Promise<TokenAndExp
   const auth = getAuth();
   const newExpiresTime = Date.now() + 15 * 60 * 1000;
   const token = await auth.createCustomToken(uuid, {
-    role: "view-protected-blog",
+    permissions: [
+      "firebase-storage-view-protected-blog",
+      "firestore-view-blog-index"
+    ],
     expiresAt: newExpiresTime,
   });
+  // await auth.setCustomUserClaims(uuid, {
+  //   permissions: [
+  //     "firebase-storage-view-protected-blog",
+  //     "firestore-view-blog-index"
+  //   ]
+  // });
   return { token, expiresAt: newExpiresTime };
 }
 

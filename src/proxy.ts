@@ -2,7 +2,7 @@
 
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { verifyTokenServer } from "@/lib/tokenAuth.server";
+import { verifyTokenServer } from "@/lib/server/server.tokenAuth";
 
 export async function proxy(request: NextRequest) {
   const session = request.cookies.get("session")?.value;

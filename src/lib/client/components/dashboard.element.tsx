@@ -41,3 +41,40 @@ export function HeaderDashboard() {
     </header>
   );
 }
+
+//
+// Toggle Button inside card
+//
+type CheckboxComponentProps = {
+	functionToCallWhenChanged?: (cardPath: string, isChacked: boolean, isWhat: string) => void;
+	cardPath: string;
+	labelOffIcon: string; // image URL
+	labelOnIcon: string;  // image URL
+	isChacked: boolean;
+	isWhat: string;
+}
+
+export function CardCheckboxComponent({
+	functionToCallWhenChanged,
+	cardPath,
+	labelOffIcon,
+	labelOnIcon,
+	isChacked,
+	isWhat,
+}: CheckboxComponentProps) {
+	return (
+		<button
+			type="button"
+			className="w-6 h-6 flex items-center justify-center"
+			onClick={() => {
+				functionToCallWhenChanged?.(cardPath, !isChacked, isWhat);
+			}}
+		>
+			<img
+				src={isChacked ? labelOnIcon : labelOffIcon}
+				alt="toggle"
+				className="w-full h-full object-contain"
+			/>
+		</button>
+	)
+}

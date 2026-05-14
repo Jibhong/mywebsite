@@ -8,6 +8,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
+  const [challengeId, setChallengeId] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,6 +18,8 @@ export default function LoginPage() {
       body: JSON.stringify({ email, password }),
     });
     if (res.ok) {
+      const response = await res.json();
+      setChallengeId(response.challengeId);
       setStep("otp");
     }
   };
@@ -26,7 +29,7 @@ export default function LoginPage() {
     const res = await fetch("/api/verify-otp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ otp }),
+      body: JSON.stringify({ otp, challengeId }),
     });
     if (res.ok) {
       const response = await res.json();

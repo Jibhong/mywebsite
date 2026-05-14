@@ -5,12 +5,11 @@ import Markdown from "react-markdown";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 
-const BLOB = process.env.NEXT_PUBLIC_VERCEL_BLOB_URL;
 
-import { Header, Footer } from "@/lib/components/elements";
+import { Header, Footer } from "@/lib/client/components/elements";
 import { useEffect, useState } from "react";
-import { getBlobUrl } from "@/lib/blogURLPhraser";
-import MarkdownComponent from "@/lib/components/markdown";
+import { getBlogUrl } from "@/lib/client/client.blogURLPhraser";
+import MarkdownComponent from "@/lib/client/components/markdown";
 
 export default function Home({ params: promise_params }: { params: { slug: string } }) {
   const [markdown, setMarkdown]  = useState<string>("");
@@ -24,8 +23,8 @@ export default function Home({ params: promise_params }: { params: { slug: strin
   async function initPage() {
     const params = await promise_params;
     
-    const res_markdown = await fetch(getBlobUrl(`/blog_page/${params.slug}/content.md`));
-    const res_metadata = await fetch(getBlobUrl(`/blog_page/${params.slug}/metadata.json`));
+    const res_markdown = await fetch(getBlogUrl(`/blog_page/${params.slug}/content.md`));
+    const res_metadata = await fetch(getBlogUrl(`/blog_page/${params.slug}/metadata.json`));
 
     if (!res_markdown.ok || !res_metadata.ok) return notFound();
 

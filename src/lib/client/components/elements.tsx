@@ -65,8 +65,9 @@ export function Footer() {
 
 interface SearchBarProps {
   onSearch?: (query: string) => void;
+  redirect: string;
 }
-export function SearchBar({ onSearch }: SearchBarProps) {
+export function SearchBar({ onSearch, redirect }: SearchBarProps) {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("search") || "";
 
@@ -78,8 +79,9 @@ export function SearchBar({ onSearch }: SearchBarProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
+
 		console.log("Searching for:", query);
-    router.push(`/blog?search=${encodeURIComponent(query)}`);
+    router.push(`/${redirect}?search=${encodeURIComponent(query)}`);
     if(onSearch)onSearch(query);
 	};
 

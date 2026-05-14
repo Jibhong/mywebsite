@@ -29,7 +29,7 @@ export function initFirebase() {
   return;
 }
 
-export const getBucket = () => {
+export const getFirebaseStorageBucket = () => {
   if (!bucket) {
     initFirebase();
     bucket = getStorage().bucket();
@@ -40,7 +40,7 @@ export const getBucket = () => {
 export const getFirestoreDB = () => {
   if (!firestore) {
     initFirebase();
-    firestore = getFirestore();
+    firestore = getFirestore("portfolio-website-firestore");
   }
   return firestore;
 }

@@ -6,17 +6,16 @@ import { notFound } from "next/navigation";
 import { useRef } from "react";
 
 
-const BLOB = process.env.NEXT_PUBLIC_VERCEL_BLOB_URL;
 
-import { Header, Footer } from "@/lib/components/elements";
+import { Header, Footer } from "@/lib/client/components/elements";
 import Image from "next/image";
 
 import { useEffect, useState } from "react";
-import { HeaderDashboard } from "@/lib/components/element.dashboard";
-import MarkdownComponent from "@/lib/components/markdown";
+import { HeaderDashboard } from "@/lib/client/components/dashboard.element";
+import MarkdownComponent from "@/lib/client/components/markdown";
 
 // Firebase stuffs
-import { singletonFirebaseStorage } from "@/lib/singleton/firebaseAuth.client";
+import { singletonFirebaseStorage } from "@/lib/client/singleton/client.firebaseAuth";
 import { ref, list, getDownloadURL } from "firebase/storage";
 import React from "react";
 

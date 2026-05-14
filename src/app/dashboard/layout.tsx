@@ -1,5 +1,5 @@
 "use client";
-import { logInToFirebase } from "@/lib/tokenFetcher.client";
+import { logInToFirebase } from "@/lib/client/client.tokenFetcher";
 import { createContext, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 

@@ -3,13 +3,14 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { signInWithCustomToken } from "firebase/auth";
-import { singletonFirebaseAuth } from "@/lib/singleton/firebaseAuth.client";
+import { singletonFirebaseAuth } from "@/lib/client/singleton/client.firebaseAuth";
 
 export async function logInToFirebase() {
   console.log("Attempting to log in to Firebase...");
   async function fetchToken() {
     const storedExpiry = localStorage.getItem("tokenExpiry");
     if (storedExpiry && parseInt(storedExpiry) > Date.now()) return;
+    console.log("Token expired fetching new Firebase token...");
     const res = await fetch("/api/get-token");
     const data = await res.json();
     if (data.token){

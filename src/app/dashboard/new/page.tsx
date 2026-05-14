@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
-import { getNewBlogUrl } from "@/lib/newBlog";
+import { getNewBlogUrl } from "@/lib/server/server.newBlog";
 import { cookies } from "next/headers";
-import { verifyTokenServer } from "@/lib/tokenAuth.server";
+import { verifyTokenServer } from "@/lib/server/server.tokenAuth";
 
 
 
