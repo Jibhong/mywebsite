@@ -32,47 +32,63 @@ function HomeContent() {
 
   const [allCard, setAllCard] = useState<Card[]>([]);
 
+  const compareCardByDateDesc = (a: Card, b: Card) => (a.date ?? 0) - (b.date ?? 0);
+
+  function binaryInsert<T>(
+    arr: T[],
+    item: T,
+    compare: (a: T, b: T) => number
+  ) {
+    let low = 0;
+    let high = arr.length;
+
+    while (low < high) {
+      const mid = (low + high) >> 1;
+
+      if (compare(arr[mid], item) < 0) {
+        high = mid;
+      } else {
+        low = mid + 1;
+      }
+    }
+
+    arr.splice(low, 0, item);
+  }
 
   useEffect(() => {
     async function fetchCards() {
-      const snapshot = await getDocs(collection(singletonFirestore, "public-blog-index"));
+      const snapshot = await getDocs(
+        collection(singletonFirestore, "public-blog-index")
+      );
 
       const folderPaths = snapshot.docs.map((doc) => doc.id);
+      setCards(Array(folderPaths.length).fill(null));
 
       await Promise.all(
-        folderPaths.map(async (folderPath, i) => {
+        folderPaths.map(async (folderPath) => {
           const res = await fetch(
             getBlogUrl(`/blog_page/${folderPath}/metadata.json`)
           );
 
           const card = await res.json();
 
-          const cardData: Card = {
+          const newCard: Card = {
             ...card,
             path: folderPath,
-            thumbnail: getBlogUrl(
-              `/blog_page/${folderPath}/preview.webp`
-            ),
+            thumbnail: getBlogUrl(`/blog_page/${folderPath}/preview.webp`),
             link: `blog/${folderPath}`,
           };
-
-          setCards((prev) => {
-            const next = [...prev];
-            next[i] = cardData;
-            return next;
-          });
           setAllCard((prev) => {
             const next = [...prev];
-            next[i] = cardData;
+            binaryInsert(next, newCard, compareCardByDateDesc);
             return next;
           });
         })
       );
+
     }
 
     fetchCards();
-
-
   }, []);
 
   useEffect(() => {

@@ -99,7 +99,6 @@ function HomeContent() {
 
       // single source of truth
       setAllCard(finalCards);
-      setCards(finalCards.sort((a, b) => b.date - a.date));
     }
 
     async function loadCards() {
@@ -188,7 +187,7 @@ function HomeContent() {
         <div id="card_container" className="px-[10%] portrait:px-[5%] max-w-[1600px] mx-auto grid grid-cols-1 gap-8">
           {cards.length > 0 ? (
             cards.map((data, index) => (
-              <div key={index} className="group relative">
+              <div key={index} className="relative">
                 {/* Card */}
                 <Link href={data.link} className="flex justify-between card-background gap-4 ">
                   <div className="flex flex-col h-full">

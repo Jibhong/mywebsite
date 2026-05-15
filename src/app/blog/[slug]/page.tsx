@@ -2,7 +2,7 @@
 
 
 import Markdown from "react-markdown";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Image from "next/image";
 
 
@@ -26,7 +26,7 @@ export default function Home({ params: promise_params }: { params: { slug: strin
     const res_markdown = await fetch(getBlogUrl(`/blog_page/${params.slug}/content.md`));
     const res_metadata = await fetch(getBlogUrl(`/blog_page/${params.slug}/metadata.json`));
 
-    if (!res_markdown.ok || !res_metadata.ok) return notFound();
+    if (!res_markdown.ok || !res_metadata.ok) redirect("/blog");
 
     setMarkdown(await res_markdown.text());
     const res_metadata_json = await res_metadata.json();
