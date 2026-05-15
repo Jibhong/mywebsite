@@ -8,6 +8,7 @@ import { Suspense } from "react";
 import { getBlogUrl } from "@/lib/client/client.blogURLPhraser";
 import { singletonFirestore } from "@/lib/client/singleton/client.firebaseAuth";
 import { collection, getDocs } from "firebase/firestore";
+import { getFirebaseStorageBucket } from "@/lib/server/server.firebaseInterface";
 
 
 
@@ -41,15 +42,26 @@ export default function Home() {
 
         const card = await res.json();
 
+        const resVersion = await fetch("/api/get-blog-version", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ blogId: folderPaths[i] }),
+        });
+        let version = 0;
+
+        const versionData = await resVersion.json();
+
+        if (versionData) {
+          version = versionData.version;
+        }
+
         const cardData: Card = {
           ...card,
           path: folderPath,
-          thumbnail: getBlogUrl(
-            `/blog_page/${folderPath}/preview.webp`
-          ),
+          thumbnail: `${getBlogUrl(`/blog_page/${folderPath}/preview.webp`)}&v=${version}`,
           link: `blog/${folderPath}`,
         };
-
+        console.log(cardData.thumbnail)
         setCards((prev) => {
           const next = [...prev];
           next[i] = cardData;
@@ -110,7 +122,7 @@ export default function Home() {
           PROJECTS
         </div>
         <Suspense fallback={<div>Loading search...</div>}>
-          <SearchBar redirect="blog"/>
+          <SearchBar redirect="blog" />
         </Suspense>
 
         <div id="card_container" className="px-[10%] portrait:px-[5%] max-w-[2000px] mx-auto grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">

@@ -72,10 +72,22 @@ function HomeContent() {
 
           const card = await res.json();
 
+          const resVersion = await fetch("/api/get-blog-version", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ blogId: folderPath }),
+          });
+          let version = 0;
+
+          const versionData = await resVersion.json();
+
+          if (versionData) {
+            version = versionData.version;
+          }
           const newCard: Card = {
             ...card,
             path: folderPath,
-            thumbnail: getBlogUrl(`/blog_page/${folderPath}/preview.webp`),
+            thumbnail: `${getBlogUrl(`/blog_page/${folderPath}/preview.webp`)}&v=${version}`,
             link: `blog/${folderPath}`,
           };
           setAllCard((prev) => {

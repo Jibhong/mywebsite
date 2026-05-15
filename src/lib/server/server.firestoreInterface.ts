@@ -79,7 +79,8 @@ export async function dbAddBlogIndex(path: string, isPublished?: boolean | undef
   }
   await docRef.set({
     isPublished,
-    isVisible
+    isVisible,
+    version: Date.now()
   })
   return true;
 }
@@ -125,7 +126,7 @@ async function setBlogFolderPublished(path: string, isPublished: boolean) {
 
 async function setBlogFolderVisible(path: string, isVisible: boolean) {
   if (isVisible === true) {
-    await dbPublicBlogIndex.doc(path).set({ path });
+    await dbPublicBlogIndex.doc(path).set({});
   } else if (isVisible === false) {
     await dbPublicBlogIndex.doc(path).delete();
   }

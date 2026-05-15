@@ -21,7 +21,7 @@ import React from "react";
 
 export default function Home({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = React.use(params);
-  const SLUG=resolvedParams.slug;
+  const SLUG = resolvedParams.slug;
   const [preview, setPreview] = useState<number>(0);
 
   const [formattedDateTime, setFormattedDateTime] = useState<string>();
@@ -50,8 +50,39 @@ export default function Home({ params }: { params: Promise<{ slug: string }> }) 
     updateTextArea();
   }, [markdown, preview]);
 
-  async function uploadPreviewImage() {
+  async function uploadPreviewImage(blogId: string) {
+    const input = document.createElement("input");
 
+    input.type = "file";
+    input.accept = "image/*";
+
+    input.onchange = async () => {
+      const file = input.files?.[0];
+
+      if (!file) return;
+
+      const formData = new FormData();
+
+      formData.append("file", file);
+      formData.append("blogId", blogId);
+
+      const res = await fetch("/api/edit/upload-preview-image", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to upload preview image");
+      } else {
+        const fileRef = ref(singletonFirebaseStorage, `blog_page/${SLUG}/preview.webp`);
+        const imageUrl = await getDownloadURL(fileRef);
+        setThumbnail(imageUrl)
+      }
+
+      console.log(await res.json());
+    };
+
+    input.click();
   }
 
   // Update formattedDateTime every second
@@ -123,7 +154,7 @@ export default function Home({ params }: { params: Promise<{ slug: string }> }) 
     };
   }, []);
 
-  async function fetchBlogData() : Promise<{ name: string; url: string }[]> {
+  async function fetchBlogData(): Promise<{ name: string; url: string }[]> {
     let listRef = ref(singletonFirebaseStorage, `blog_page/${SLUG}/`);
     let result = await list(listRef);
 
@@ -135,7 +166,7 @@ export default function Home({ params }: { params: Promise<{ slug: string }> }) 
       console.log("Fetching firestore data at:", `blog_page/${SLUG}/`);
     }
     console.log("Result received:", result);
-    
+
     const blogDataUrlPair = await Promise.all(
       result.items.map(async (item) => ({
         name: item.name,
@@ -267,8 +298,7 @@ export default function Home({ params }: { params: Promise<{ slug: string }> }) 
                       width={400}
                       height={400}
                       className="w-30 h-30 xl:w-40 xl:h-40 object-cover rounded-2xl hover:cursor-pointer"
-                      onClick={() => console.log("clicked!")}
-                    />
+                      onClick={() => uploadPreviewImage(SLUG)} />
 
                   </div>
 

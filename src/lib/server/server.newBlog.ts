@@ -17,8 +17,8 @@ async function generateUniqueFolder(): Promise<string> {
 
     exists = await dbBlogIndexExisted(folderName);
   }
-  
-  dbAddBlogIndex(folderName,false,false);
+
+  dbAddBlogIndex(folderName, false, false);
   return folderName;
 }
 
@@ -36,14 +36,14 @@ export async function getNewBlogUrl(): Promise<string> {
     date: Math.floor(Date.now() / 1000),
   };
 
-  {
-    const filePath = `${folderPath}metadata.json`;
-    const file = bucket.file(filePath);
 
-    await file.save(JSON.stringify(data, null, 2), {
-      contentType: "application/json",
-    });
-  }
+  const filePath = `${folderPath}metadata.json`;
+  const file = bucket.file(filePath);
+
+  await file.save(JSON.stringify(data, null, 2), {
+    contentType: "application/json",
+  });
+
 
 
   return folderName; // return full path
