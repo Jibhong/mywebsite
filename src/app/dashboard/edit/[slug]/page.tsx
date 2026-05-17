@@ -244,7 +244,7 @@ export default function Home({ params }: { params: Promise<{ slug: string }> }) 
     const metadata = {
       title,
       description,
-      date: Date.now()/1000,
+      date: Math.floor(Date.now()/1000),
     };
     formData.append("markdown", markdown);
     formData.append("metadata", JSON.stringify(metadata));

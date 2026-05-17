@@ -28,11 +28,11 @@ function HomeContent() {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("search") || "";
 
-  const [cards, setCards] = useState<Card[]>([]);
+  const [cards, setCards] = useState<(Card|null)[]>([]);
 
-  const [allCard, setAllCard] = useState<Card[]>([]);
+  const [allCard, setAllCard] = useState<(Card|null)[]>([]);
 
-  const compareCardByDateDesc = (a: Card, b: Card) => (a.date ?? 0) - (b.date ?? 0);
+  const compareCardByDateDesc = (a: Card | null, b: Card | null) => (a?.date ?? 0) - (b?.date ?? 0);
 
   function binaryInsert<T>(
     arr: T[],
@@ -57,47 +57,61 @@ function HomeContent() {
 
   useEffect(() => {
     async function fetchCards() {
-      const snapshot = await getDocs(
-        collection(singletonFirestorePublic, "public-blog-index")
-      );
+      const snapshot = await getDocs(collection(singletonFirestorePublic, "public-blog-index"));
 
       const folderPaths = snapshot.docs.map((doc) => doc.id);
+
       setCards(Array(folderPaths.length).fill(null));
 
-      await Promise.all(
-        folderPaths.map(async (folderPath) => {
-          const res = await fetch(
-            getBlogUrl(`/blog_page/${folderPath}/metadata.json`)
-          );
+      folderPaths.forEach(async (folderPath) => {
+          const [res, resVersion] = await Promise.all([
+            fetch(
+              getBlogUrl(
+                `/blog_page/${folderPath}/metadata.json`
+              )
+            ),
+            fetch("/api/get-blog-version", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                blogId: folderPath,
+              }),
+            }),
+          ]);
 
           const card = await res.json();
-
-          const resVersion = await fetch("/api/get-blog-version", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ blogId: folderPath }),
-          });
-          let version = 0;
-
           const versionData = await resVersion.json();
 
-          if (versionData) {
-            version = versionData.version;
-          }
+          const version = versionData?.version ?? 0;
+
           const newCard: Card = {
             ...card,
             path: folderPath,
             thumbnail: `${getBlogUrl(`/blog_page/${folderPath}/preview.webp`)}&v=${version}`,
             link: `blog/${folderPath}`,
           };
+
           setAllCard((prev) => {
+            // remove one placeholder null
             const next = [...prev];
-            binaryInsert(next, newCard, compareCardByDateDesc);
+            const nullIndex = next.indexOf(null);
+
+            if (nullIndex !== -1) {
+              next.splice(nullIndex, 1);
+            }
+
+            // insert sorted
+            binaryInsert(
+              next,
+              newCard,
+              compareCardByDateDesc
+            );
+
             return next;
           });
-        })
-      );
-
+      });
     }
 
     fetchCards();

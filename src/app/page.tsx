@@ -16,12 +16,35 @@ interface Card {
   path: string;
   thumbnail: string;
   link: string;
+  date: number;
 }
 
 export default function Home() {
 
-  const [cards, setCards] = useState<Card[]>([]);
+  const [cards, setCards] = useState<(Card | null)[]>([]);
 
+  const compareCardByDateDesc = (a: Card | null, b: Card | null) => (a?.date ?? 0) - (b?.date ?? 0);
+
+  function binaryInsert<T>(
+    arr: T[],
+    item: T,
+    compare: (a: T, b: T) => number
+  ) {
+    let low = 0;
+    let high = arr.length;
+
+    while (low < high) {
+      const mid = (low + high) >> 1;
+
+      if (compare(arr[mid], item) < 0) {
+        high = mid;
+      } else {
+        low = mid + 1;
+      }
+    }
+
+    arr.splice(low, 0, item);
+  }
 
   useEffect(() => {
     async function fetchCards() {
@@ -29,11 +52,15 @@ export default function Home() {
 
       const folderPaths = snapshot.docs.map((doc) => doc.id);
 
-      setCards(Array(Math.min(6, folderPaths.length)).fill(null));
+      setCards(Array(folderPaths.length).fill(null));
 
-      folderPaths.slice(0, 6).forEach(async (folderPath, i) => {
+      folderPaths.forEach(async (folderPath) => {
         const [res, resVersion] = await Promise.all([
-          fetch(getBlogUrl(`/blog_page/${folderPath}/metadata.json`)),
+          fetch(
+            getBlogUrl(
+              `/blog_page/${folderPath}/metadata.json`
+            )
+          ),
           fetch("/api/get-blog-version", {
             method: "POST",
             headers: {
@@ -50,23 +77,32 @@ export default function Home() {
 
         const version = versionData?.version ?? 0;
 
-        const cardData: Card = {
+        const newCard: Card = {
           ...card,
           path: folderPath,
-          thumbnail: `${getBlogUrl(
-            `/blog_page/${folderPath}/preview.webp`
-          )}&v=${version}`,
+          thumbnail: `${getBlogUrl(`/blog_page/${folderPath}/preview.webp`)}&v=${version}`,
           link: `blog/${folderPath}`,
         };
 
         setCards((prev) => {
+          // remove one placeholder null
           const next = [...prev];
-          next[i] = cardData;
+          const nullIndex = next.indexOf(null);
+
+          if (nullIndex !== -1) {
+            next.splice(nullIndex, 1);
+          }
+
+          // insert sorted
+          binaryInsert(
+            next,
+            newCard,
+            compareCardByDateDesc
+          );
+
           return next;
         });
-
       });
-
     }
 
     fetchCards();
