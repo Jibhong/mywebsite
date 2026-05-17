@@ -6,10 +6,8 @@ import { Header, Footer, SearchBar } from "@/lib/client/components/elements";
 import { useEffect, useState } from "react";
 import { Suspense } from "react";
 import { getBlogUrl } from "@/lib/client/client.blogURLPhraser";
-import { singletonFirestore } from "@/lib/client/singleton/client.firebaseAuth";
+import { singletonFirestorePublic } from "@/lib/client/singleton/client.firebasePublic";
 import { collection, getDocs } from "firebase/firestore";
-import { getFirebaseStorageBucket } from "@/lib/server/server.firebaseInterface";
-
 
 
 interface Card {
@@ -27,47 +25,48 @@ export default function Home() {
 
   useEffect(() => {
     async function fetchCards() {
-      const snapshot = await getDocs(collection(singletonFirestore, "public-blog-index"));
+      const snapshot = await getDocs(collection(singletonFirestorePublic, "public-blog-index"));
 
       const folderPaths = snapshot.docs.map((doc) => doc.id);
 
       setCards(Array(Math.min(6, folderPaths.length)).fill(null));
 
-      for (let i = 0; i < Math.min(6, folderPaths.length); i++) {
-        const folderPath = folderPaths[i];
-
-        const res = await fetch(
-          getBlogUrl(`/blog_page/${folderPath}/metadata.json`)
-        );
+      folderPaths.slice(0, 6).forEach(async (folderPath, i) => {
+        const [res, resVersion] = await Promise.all([
+          fetch(getBlogUrl(`/blog_page/${folderPath}/metadata.json`)),
+          fetch("/api/get-blog-version", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              blogId: folderPath,
+            }),
+          }),
+        ]);
 
         const card = await res.json();
-
-        const resVersion = await fetch("/api/get-blog-version", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ blogId: folderPaths[i] }),
-        });
-        let version = 0;
-
         const versionData = await resVersion.json();
 
-        if (versionData) {
-          version = versionData.version;
-        }
+        const version = versionData?.version ?? 0;
 
         const cardData: Card = {
           ...card,
           path: folderPath,
-          thumbnail: `${getBlogUrl(`/blog_page/${folderPath}/preview.webp`)}&v=${version}`,
+          thumbnail: `${getBlogUrl(
+            `/blog_page/${folderPath}/preview.webp`
+          )}&v=${version}`,
           link: `blog/${folderPath}`,
         };
-        console.log(cardData.thumbnail)
+
         setCards((prev) => {
           const next = [...prev];
           next[i] = cardData;
           return next;
         });
-      }
+
+      });
+
     }
 
     fetchCards();

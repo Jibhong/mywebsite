@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { getBlogUrl } from "@/lib/client/client.blogURLPhraser";
-import { singletonFirestore } from "@/lib/client/singleton/client.firebaseAuth";
+import { singletonFirestorePublic } from "@/lib/client/singleton/client.firebasePublic";
 import { collection, getDocs } from "firebase/firestore";
 
 
@@ -58,7 +58,7 @@ function HomeContent() {
   useEffect(() => {
     async function fetchCards() {
       const snapshot = await getDocs(
-        collection(singletonFirestore, "public-blog-index")
+        collection(singletonFirestorePublic, "public-blog-index")
       );
 
       const folderPaths = snapshot.docs.map((doc) => doc.id);

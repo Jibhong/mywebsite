@@ -35,7 +35,7 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "src/app/dashboard/edit/[slug]/page.bak.tsx"
-  ],
+, "src/app/dashboard/layout.tsx"  ],
   "exclude": [
     "node_modules"
   ]
