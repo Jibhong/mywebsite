@@ -15,22 +15,25 @@ import { HeaderDashboard } from "@/lib/client/components/dashboard.element";
 import MarkdownComponent from "@/lib/client/components/markdown";
 
 // Firebase stuffs
-import { singletonFirebaseStorage } from "@/lib/client/singleton/client.firebaseAuth";
+import { singletonFirebaseStorage, singletonFirestore } from "@/lib/client/singleton/client.firebaseAuth";
 import { ref, list, getDownloadURL } from "firebase/storage";
 import React from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { metadata } from "@/app/layout";
 
 export default function Home({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = React.use(params);
   const SLUG = resolvedParams.slug;
-  const [preview, setPreview] = useState<number>(0);
+  const [preview, buttonPreview] = useState<number>(0);
 
   const [formattedDateTime, setFormattedDateTime] = useState<string>();
   const [title, setTitle] = useState<string>("Title");
   const [description, setDescription] = useState<string>("Description");
   const [thumbnail, setThumbnail] = useState<string>("/loading.gif");
-
   const [markdown, setMarkdown] = useState<string>("# Markdown");
 
+  const [isPublished, setIsPublished] = useState<boolean>();
+  const [isVisible, setIsVisible] = useState<boolean>();
 
 
 
@@ -50,7 +53,7 @@ export default function Home({ params }: { params: Promise<{ slug: string }> }) 
     updateTextArea();
   }, [markdown, preview]);
 
-  async function uploadPreviewImage(blogId: string) {
+  async function uploadPreviewImage() {
     const input = document.createElement("input");
 
     input.type = "file";
@@ -63,10 +66,10 @@ export default function Home({ params }: { params: Promise<{ slug: string }> }) 
 
       const formData = new FormData();
 
-      formData.append("file", file);
-      formData.append("blogId", blogId);
+      formData.append("previewImage", file);
+      formData.append("blogId", SLUG);
 
-      const res = await fetch("/api/edit/upload-preview-image", {
+      const res = await fetch("/api/edit/upload", {
         method: "POST",
         body: formData,
       });
@@ -177,7 +180,7 @@ export default function Home({ params }: { params: Promise<{ slug: string }> }) 
     console.log("blogDataUrlPair:", blogDataUrlPair);
     return blogDataUrlPair;
   }
-
+  // Load content
   useEffect(() => {
     async function loadContent() {
       const blogDataUrlPair = await fetchBlogData();
@@ -222,56 +225,100 @@ export default function Home({ params }: { params: Promise<{ slug: string }> }) 
 
   }, []);
 
+  // Load Publication Status
+  async function loadPublicationStatus() {
+    const snap = await getDoc(doc(singletonFirestore, "blog-index", SLUG));
+    if (!snap.exists) return;
+    const snapData = snap.data();
+    if (!snapData) return;
+    setIsPublished(snapData.isPublished);
+    setIsVisible(snapData.isVisible);
+  }
+  useEffect(() => {
+    loadPublicationStatus();
+  }, []);
+
+  async function buttonSave() {
+
+    const formData = new FormData();
+    const metadata = {
+      title,
+      description,
+      date: Date.now(),
+    };
+    formData.append("markdown", markdown);
+    formData.append("metadata", JSON.stringify(metadata));
+    formData.append("blogId", SLUG);
+
+    const res = await fetch("/api/edit/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+  }
+
+  async function updateBlogIndexValue(blogId: string, isWhatValue: boolean, isWhat: string) {
+
+    await fetch("/api/set-blog-index", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        blogId: blogId,
+        [isWhat]: isWhatValue
+      }),
+    });
+    await loadPublicationStatus();
+  }
+
   return (
     <div className="pt-30 font-sans bg-orange-50 min-h-screen flex flex-col">
       <HeaderDashboard />
 
       <main className="flex-1 flex-col max-w-auto">
         <div className="mb-4 flex max-w-3xl mx-auto justify-between border rounded-2xl border-gray-400 p-6">
-          <div className="flex gap-2">
+          <div className="flex gap-2 text-white">
             <button
-              onClick={() => setPreview(0)}
+              onClick={() => buttonPreview(0)}
               className={`px-4 py-2 rounded-lg transition ${preview != 0 ? "bg-orange-400 hover:bg-orange-300 hover:cursor-pointer" : "bg-orange-200 text-white"
                 }`}
             >
               Edit
             </button>
             <button
-              onClick={() => setPreview(1)}
+              onClick={() => buttonPreview(1)}
               className={`px-4 py-2 rounded-lg transition ${preview != 1 ? "bg-orange-400 hover:bg-orange-300 hover:cursor-pointer" : "bg-orange-200 text-white"
                 }`}
             >
               Preview
             </button>
             <button
-              onClick={() => setPreview(2)}
+              onClick={() => buttonPreview(2)}
               className={`px-4 py-2 rounded-lg transition ${preview != 2 ? "bg-orange-400 hover:bg-orange-300 hover:cursor-pointer" : "bg-orange-200 text-white"
                 }`}
             >
               Compare
             </button>
           </div>
-          <div className="flex gap-2 ">
+          <div className="flex gap-2 text-white">
             <button
-              onClick={() => setPreview(0)}
-              className={`px-4 py-2 rounded-lg transition ${"bg-orange-400 hover:bg-orange-300 hover:cursor-pointer"
-                }`}
-            >
-              Load
-            </button>
-            <button
-              onClick={() => setPreview(1)}
-              className={`px-4 py-2 rounded-lg transition ${"bg-orange-400 hover:bg-orange-300 hover:cursor-pointer"
-                }`}
+              onClick={() => buttonSave()}
+              className={`px-4 py-2 rounded-lg transition ${"bg-orange-400 hover:bg-orange-300 hover:cursor-pointer"}`}
             >
               Save
             </button>
             <button
-              onClick={() => setPreview(2)}
-              className={`px-4 py-2 rounded-lg transition ${"bg-orange-400 hover:bg-orange-300 hover:cursor-pointer"
-                }`}
+              onClick={() => updateBlogIndexValue(SLUG, !isPublished, "isPublished")}
+              className={`px-4 py-2 rounded-lg transition ${"bg-orange-400 hover:bg-orange-300 hover:cursor-pointer"}`}
             >
-              Publish
+              {isPublished ? "Unpublish" : "Publish"}
+            </button>
+            <button
+              onClick={() => updateBlogIndexValue(SLUG, !isVisible, "isVisible")}
+              className={`px-4 py-2 rounded-lg transition ${"bg-orange-400 hover:bg-orange-300 hover:cursor-pointer"}`}
+            >
+              {isVisible ? "Unlist" : "List"}
             </button>
           </div>
         </div>
@@ -298,7 +345,7 @@ export default function Home({ params }: { params: Promise<{ slug: string }> }) 
                       width={400}
                       height={400}
                       className="w-30 h-30 xl:w-40 xl:h-40 object-cover rounded-2xl hover:cursor-pointer"
-                      onClick={() => uploadPreviewImage(SLUG)} />
+                      onClick={() => uploadPreviewImage()} />
 
                   </div>
 
