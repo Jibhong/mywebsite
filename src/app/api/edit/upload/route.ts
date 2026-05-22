@@ -26,7 +26,8 @@ export async function POST(req: NextRequest) {
   const reqMarkdown = formData.get("markdown") as string | null;
   const reqMetadata = formData.get("metadata") as string | null;
   const blogId = formData.get("blogId") as string | null;
-
+  const uploadFile = formData.get("uploadFile") as File | null;
+  const uploadFileName = formData.get("uploadFileName") as string | null;
   if (!blogId) {
     return NextResponse.json({ error: "Invalid parameters" }, { status: 400 });
   }
@@ -102,6 +103,20 @@ export async function POST(req: NextRequest) {
         contentType: "application/json",
         metadata: newMetadata
       }
+    });
+  }
+  if (uploadFile && uploadFileName) {
+    const arrayBuffer = await uploadFile.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    const firebaseFile = bucket.file(
+      `blog_page/${blogId}/file/${uploadFileName}`
+    );
+
+    await firebaseFile.save(buffer, {
+      metadata: {
+        metadata: newMetadata,
+      },
     });
   }
   await docRef.update({

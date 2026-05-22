@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { Suspense } from "react";
 import { getBlogUrl } from "@/lib/client/client.blogURLPhraser";
 import { singletonFirestorePublic } from "@/lib/client/singleton/client.firebasePublic";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 
 
 interface Card {
@@ -61,22 +61,11 @@ export default function Home() {
               `/blog_page/${folderPath}/metadata.json`
             )
           ),
-          fetch("/api/get-blog-version", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              blogId: folderPath,
-            }),
-          }),
+          getDoc(doc(singletonFirestorePublic, "blog-index", folderPath))
         ]);
 
         const card = await res.json();
-        const versionData = await resVersion.json();
-
-        const version = versionData?.version ?? 0;
-
+        const version = resVersion.data()?.version ?? 0;
         const newCard: Card = {
           ...card,
           path: folderPath,

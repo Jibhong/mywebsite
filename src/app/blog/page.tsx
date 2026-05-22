@@ -9,7 +9,7 @@ import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { getBlogUrl } from "@/lib/client/client.blogURLPhraser";
 import { singletonFirestorePublic } from "@/lib/client/singleton/client.firebasePublic";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 
 
 
@@ -28,9 +28,9 @@ function HomeContent() {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("search") || "";
 
-  const [cards, setCards] = useState<(Card|null)[]>([]);
+  const [cards, setCards] = useState<(Card | null)[]>([]);
 
-  const [allCard, setAllCard] = useState<(Card|null)[]>([]);
+  const [allCard, setAllCard] = useState<(Card | null)[]>([]);
 
   const compareCardByDateDesc = (a: Card | null, b: Card | null) => (a?.date ?? 0) - (b?.date ?? 0);
 
@@ -64,53 +64,42 @@ function HomeContent() {
       setCards(Array(folderPaths.length).fill(null));
 
       folderPaths.forEach(async (folderPath) => {
-          const [res, resVersion] = await Promise.all([
-            fetch(
-              getBlogUrl(
-                `/blog_page/${folderPath}/metadata.json`
-              )
-            ),
-            fetch("/api/get-blog-version", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                blogId: folderPath,
-              }),
-            }),
-          ]);
+        const [res, resVersion] = await Promise.all([
+          fetch(
+            getBlogUrl(
+              `/blog_page/${folderPath}/metadata.json`
+            )
+          ),
+          getDoc(doc(singletonFirestorePublic, "blog-index", folderPath))
+        ]);
 
-          const card = await res.json();
-          const versionData = await resVersion.json();
+        const card = await res.json();
+        const version = resVersion.data()?.version ?? 0;
+        const newCard: Card = {
+          ...card,
+          path: folderPath,
+          thumbnail: `${getBlogUrl(`/blog_page/${folderPath}/preview.webp`)}&v=${version}`,
+          link: `blog/${folderPath}`,
+        };
 
-          const version = versionData?.version ?? 0;
+        setAllCard((prev) => {
+          // remove one placeholder null
+          const next = [...prev];
+          const nullIndex = next.indexOf(null);
 
-          const newCard: Card = {
-            ...card,
-            path: folderPath,
-            thumbnail: `${getBlogUrl(`/blog_page/${folderPath}/preview.webp`)}&v=${version}`,
-            link: `blog/${folderPath}`,
-          };
+          if (nullIndex !== -1) {
+            next.splice(nullIndex, 1);
+          }
 
-          setAllCard((prev) => {
-            // remove one placeholder null
-            const next = [...prev];
-            const nullIndex = next.indexOf(null);
+          // insert sorted
+          binaryInsert(
+            next,
+            newCard,
+            compareCardByDateDesc
+          );
 
-            if (nullIndex !== -1) {
-              next.splice(nullIndex, 1);
-            }
-
-            // insert sorted
-            binaryInsert(
-              next,
-              newCard,
-              compareCardByDateDesc
-            );
-
-            return next;
-          });
+          return next;
+        });
       });
     }
 

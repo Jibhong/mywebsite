@@ -11,11 +11,9 @@ import { HeaderDashboard, CardCheckboxComponent } from "@/lib/client/components/
 
 import { ref, list, getDownloadURL } from "firebase/storage";
 import { singletonFirebaseStorage, singletonFirestore } from "@/lib/client/singleton/client.firebaseAuth";
-import { AppReadyContext } from "./layout";
+import { isFirebaseLoginContext } from "./layout";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 
-
-const BLOB = process.env.NEXT_PUBLIC_VERCEL_BLOB_URL;
 
 interface Card {
   title: string;
@@ -30,7 +28,7 @@ interface Card {
 }
 
 function HomeContent() {
-  const loggedInToFirebase = useContext(AppReadyContext);
+  const loggedInToFirebase = useContext(isFirebaseLoginContext);
 
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("search") || "";

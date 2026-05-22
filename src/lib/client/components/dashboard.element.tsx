@@ -70,10 +70,12 @@ export function CardCheckboxComponent({
 				functionToCallWhenChanged?.(cardPath, !isChacked, isWhat);
 			}}
 		>
-			<img
+			<Image
 				src={isChacked ? labelOnIcon : labelOffIcon}
 				alt="toggle"
 				className="w-full h-full object-contain"
+        width={24}
+        height={24}
 			/>
 		</button>
 	)

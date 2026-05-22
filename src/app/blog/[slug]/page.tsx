@@ -12,17 +12,17 @@ import { getBlogUrl } from "@/lib/client/client.blogURLPhraser";
 import MarkdownComponent from "@/lib/client/components/markdown";
 
 export default function Home({ params: promise_params }: { params: { slug: string } }) {
-  const [markdown, setMarkdown]  = useState<string>("");
+  const [markdown, setMarkdown] = useState<string>("");
   const [metadata, setMetadata] = useState<{ title: string; description: string; date: number }>({
     title: "Loading...",
     description: "",
     date: 0,
   });
   const [formattedDateTime, setFormattedDateTime] = useState<string>("");
-  
+
   async function initPage() {
     const params = await promise_params;
-    
+
     const res_markdown = await fetch(getBlogUrl(`/blog_page/${params.slug}/content.md`));
     const res_metadata = await fetch(getBlogUrl(`/blog_page/${params.slug}/metadata.json`));
 
@@ -30,7 +30,7 @@ export default function Home({ params: promise_params }: { params: { slug: strin
 
     setMarkdown(await res_markdown.text());
     const res_metadata_json = await res_metadata.json();
-    setMetadata(res_metadata_json); 
+    setMetadata(res_metadata_json);
 
     const metadata_timestamp = Number(res_metadata_json.date) * 1000; // convert to milliseconds
     const metadata_date = new Date(metadata_timestamp);
@@ -51,26 +51,8 @@ export default function Home({ params: promise_params }: { params: { slug: strin
   useEffect(() => {
     initPage();
   }, []);
-//   const markdown = `
-
-// # 👋 Hello, I'm Jibhong
-
-// I'm a self-taught developer currently studying at Triam Udom Suksa School.
-
-// I'm Interested in Competitive Programming, Web Development, AI and Game Development.
-
-// I also do some 3D modeling, and fursuit making as a hobby.
-
-// ## 🌳 My Forest (The Greener The Better)
-
-
-// ## 💻 Actually Stacking Tech
-// ![A beautiful sunrise](https://go-skill-icons.vercel.app/api/icons?i=bash,c,c,c,c,c,c,c,c,c,c,cs,cpp,css,tailwindcss,html,javascript,typescript,luau,python")
-
-
-// `
   return (
-     <div className="pt-30 font-sans bg-orange-50 min-h-screen flex flex-col">
+    <div className="pt-30 font-sans bg-orange-50 min-h-screen flex flex-col">
       <Header />
       {/* Container */}
       <main className="flex-1 flex justify-center items-start">

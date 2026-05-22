@@ -3,7 +3,7 @@ import { logInToFirebase } from "@/lib/client/client.tokenFetcher";
 import { createContext, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
-export const AppReadyContext = createContext(false);
+export const isFirebaseLoginContext = createContext(false);
 
 
 export default function DashboardLayout({
@@ -23,8 +23,8 @@ export default function DashboardLayout({
   }, [pathname]);
 
   return (
-    <AppReadyContext.Provider value={loggedInToFirebase}>
+    <isFirebaseLoginContext.Provider value={loggedInToFirebase}>
       {children}
-    </AppReadyContext.Provider>
+    </isFirebaseLoginContext.Provider>
   );
 }
