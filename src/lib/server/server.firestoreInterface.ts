@@ -151,13 +151,13 @@ export async function dbUpdateBlogIndex(path: string, isPublished?: boolean | un
     isPublished = true;
 
   if (typeof isPublished === "boolean") {
-    setBlogFolderPublished(path, isPublished);
+    await setBlogFolderPublished(path, isPublished);
     updateData.isPublished = isPublished;
 
   }
 
   if (typeof isVisible === "boolean") {
-    setBlogFolderVisible(path, isVisible);
+    await setBlogFolderVisible(path, isVisible);
     updateData.isVisible = isVisible;
   }
 
