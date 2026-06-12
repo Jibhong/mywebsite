@@ -1,5 +1,3 @@
-# syntax=docker/dockerfile:1.4
-
 # --- STAGE 1: Base image ---
 FROM node:22-alpine AS base
 # RUN apk add --no-cache libc6-compat
@@ -27,8 +25,6 @@ ENV NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET="portfolio-website-db-2cf7d.firebasestor
 ENV NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="983966396927"
 ENV NEXT_PUBLIC_FIREBASE_APP_ID="1:983966396927:web:292d4ed3580faa4c0477ca"
 ENV NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID="G-X1WD5D720H"
-
-RUN --mount=type=secret,id=firebase cat /run/secrets/firebase > .env
 
 RUN npm run build
 
