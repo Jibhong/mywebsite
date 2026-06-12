@@ -1,0 +1,18 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    secretEnv: ['FIREBASE_JSON']
+    args:
+      [
+        'build',
+        '--secret', 'id=firebase,env=FIREBASE_JSON',
+        '-t', 'gcr.io/$PROJECT_ID/app',
+        '.'
+      ]
+
+availableSecrets:
+  secretManager:
+    - versionName: projects/$PROJECT_ID/secrets/jibhong-website-secrets/versions/latest
+      env: FIREBASE_JSON
+
+images:
+  - 'gcr.io/$PROJECT_ID/app'
