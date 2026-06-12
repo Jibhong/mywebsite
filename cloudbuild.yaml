@@ -13,14 +13,10 @@ steps:
 
   # Step 2: Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
-    env:
-      - 'DOCKER_BUILDKIT=1'
     args:
       - 'build'
       - '-t'
       - 'gcr.io/$PROJECT_ID/jibhong-website'
-      - '--secret'
-      - 'id=dotenv,src=.env'
       - '.'
 
   # Step 3: Push
