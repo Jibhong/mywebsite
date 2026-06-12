@@ -28,9 +28,7 @@ ENV NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="983966396927"
 ENV NEXT_PUBLIC_FIREBASE_APP_ID="1:983966396927:web:292d4ed3580faa4c0477ca"
 ENV NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID="G-X1WD5D720H"
 
-RUN --mount=type=secret,id=firebase \
-    cat /run/secrets/firebase > .env
-
+RUN --mount=type=secret,id=firebase cat /run/secrets/firebase > .env
 
 RUN npm run build
 
