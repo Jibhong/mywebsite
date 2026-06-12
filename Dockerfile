@@ -1,6 +1,5 @@
 # --- STAGE 1: Base image ---
 FROM node:22-alpine AS base
-# RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # --- STAGE 2: Install dependencies ---
@@ -13,18 +12,8 @@ FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Cloud Run injects environment variables at runtime, but Next.js bakes 
-# NEXT_PUBLIC_ vars into the client-side bundle at BUILD time.
-# If you have NEXT_PUBLIC_ variables, uncomment and define them here:
-# ENV NEXT_PUBLIC_MY_VAR=value
-
-ENV NEXT_PUBLIC_FIREBASE_API_KEY="AIzaSyDgRIf7dZbCcxUmL7RXrA04E-hRt9DeZ5E"
-ENV NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="portfolio-website-db-2cf7d.firebaseapp.com"
-ENV NEXT_PUBLIC_FIREBASE_PROJECT_ID="portfolio-website-db-2cf7d"
-ENV NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET="portfolio-website-db-2cf7d.firebasestorage.app"
-ENV NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="983966396927"
-ENV NEXT_PUBLIC_FIREBASE_APP_ID="1:983966396927:web:292d4ed3580faa4c0477ca"
-ENV NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID="G-X1WD5D720H"
+# Overwrite the empty .env with the real one injected by Cloud Build
+COPY .env .env
 
 RUN npm run build
 
@@ -39,17 +28,17 @@ RUN adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app/public ./public
 
-# Set permissions for the prerender cache
 RUN mkdir .next
 RUN chown nextjs:nodejs .next
 
-# Leverage Next.js standalone output tracing
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Carry the real .env into the runner so server-side vars work at runtime
+COPY --from=builder --chown=nextjs:nodejs /app/.env .env
 
 USER nextjs
 
 EXPOSE 8080
 
-# The standalone build outputs a 'server.js' file that launches the app
 CMD ["node", "server.js"]
