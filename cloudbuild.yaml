@@ -1,6 +1,6 @@
 # cloudbuild.yaml
 steps:
-  # Step 1: Pull your .env secret from Secret Manager
+  # Step 1: Pull .env from Secret Manager into workspace
   - name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
     args:
@@ -9,7 +9,7 @@ steps:
         gcloud secrets versions access latest \
           --secret="jibhong-website-secret" \
           --project="983966396927" \
-          > .env
+          > /workspace/.env
 
   # Step 2: Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
@@ -21,7 +21,21 @@ steps:
 
   # Step 3: Push
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/jibhong-website']
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/jibhong-website'
+
+  # Step 4: Deploy to Cloud Run with secret also mounted at runtime
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'jibhong-website'
+      - '--image=gcr.io/$PROJECT_ID/jibhong-website'
+      - '--region=asia-southeast1'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--set-secrets=/app/.env=jibhong-website-secret:latest'
 
 images:
   - 'gcr.io/$PROJECT_ID/jibhong-website'
