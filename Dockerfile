@@ -26,9 +26,7 @@ ENV NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="983966396927"
 ENV NEXT_PUBLIC_FIREBASE_APP_ID="1:983966396927:web:292d4ed3580faa4c0477ca"
 ENV NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID="G-X1WD5D720H"
 
-COPY .env .env
-RUN node -e "const fs = require('fs'); const env = fs.readFileSync('.env', 'utf8').split('\n').filter(l => l.trim() && !l.trim().startsWith('#')).map(l => { const m = l.match(/^([^=:]+)[=:](.*)$/); return m ? m[1].trim() + '=' + m[2].trim() : '' }).filter(Boolean).join('\n'); fs.writeFileSync('.env', env);" \
-    && npm run build
+RUN npm run build
 
 # --- STAGE 4: Production runner ---
 FROM base AS runner
