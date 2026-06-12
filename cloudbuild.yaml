@@ -2,10 +2,11 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: bash
     secretEnv: ['FIREBASE_ENV']
+    env:
+      - 'DOCKER_BUILDKIT=1'
     args:
       - -c
       - |
-        export DOCKER_BUILDKIT=1
         docker build \
           --secret id=firebase,env=FIREBASE_ENV \
           -t gcr.io/$PROJECT_ID/app .
