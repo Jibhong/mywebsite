@@ -1,5 +1,3 @@
-export const dynamic = 'force-dynamic';
-
 import { initializeApp, getApps, cert } from "firebase-admin/app";
 import { getStorage } from "firebase-admin/storage";
 import { Bucket } from "@google-cloud/storage";
