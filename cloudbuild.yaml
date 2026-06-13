@@ -8,7 +8,7 @@ steps:
       - '-c'
       - |
         if [ -n "$$BUILD_SECRET" ]; then
-          echo "BUILD_SECRET length: $$BUILD_SECRET"
+          echo "BUILD_SECRET length: ${#BUILD_SECRET}"
         else
           echo "BUILD_SECRET is not set or empty"
         fi
@@ -18,7 +18,7 @@ steps:
           -t asia-southeast3-docker.pkg.dev/$PROJECT_ID/portfolio-website/jibhong-website:$COMMIT_SHA \
           .
     secretEnv: ['BUILD_SECRET']
-
+    
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     args:
