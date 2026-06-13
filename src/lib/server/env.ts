@@ -9,5 +9,7 @@ export const env = {
         return [key.trim(), rest.join("=").trim().replace(/^"|"$/g, "")];
       })
   ),
-  ...process.env // This ensures actual process.env variables take priority
+  ...Object.fromEntries(
+    Object.entries(process.env).filter(([, v]) => v !== "" && v !== undefined)
+  )
 };
