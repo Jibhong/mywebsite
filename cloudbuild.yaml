@@ -2,16 +2,6 @@ options:
   logging: CLOUD_LOGGING_ONLY
 
 steps:
-  - name: 'ubuntu'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        echo "=== cloudbuild.yaml loaded from repo ==="
-        echo "PROJECT_ID: $PROJECT_ID"
-        echo "BUILD_SECRET length: $${#BUILD_SECRET}"
-    secretEnv: ['BUILD_SECRET']
-
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     args:
