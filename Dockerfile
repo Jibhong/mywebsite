@@ -12,6 +12,9 @@ FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+ARG BUILD_SECRET
+ENV BUILD_SECRET=${BUILD_SECRET}
+
 RUN npm run build
 
 # --- STAGE 4: Production runner ---
