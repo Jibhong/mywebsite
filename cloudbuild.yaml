@@ -1,10 +1,43 @@
+options:
+  logging: CLOUD_LOGGING_ONLY
+
 steps:
   - name: 'ubuntu'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        echo "=== cloudbuild.yaml inside repo is being used ==="
+        echo "=== cloudbuild.yaml loaded from repo ==="
         echo "PROJECT_ID: $PROJECT_ID"
         echo "BUILD_SECRET length: $${#BUILD_SECRET}"
     secretEnv: ['BUILD_SECRET']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        docker build \
+          --build-arg BUILD_SECRET="$$BUILD_SECRET" \
+          -t asia-southeast3-docker.pkg.dev/$PROJECT_ID/portfolio-website/jibhong-website:$COMMIT_SHA \
+          .
+    secretEnv: ['BUILD_SECRET']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'asia-southeast3-docker.pkg.dev/$PROJECT_ID/portfolio-website/jibhong-website:$COMMIT_SHA'
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    args:
+      - 'run'
+      - 'services'
+      - 'update'
+      - 'jibhong-portfolio-website'
+      - '--image=asia-southeast3-docker.pkg.dev/$PROJECT_ID/portfolio-website/jibhong-website:$COMMIT_SHA'
+      - '--region=asia-southeast3'
+
+availableSecrets:
+  secretManager:
+    - versionName: projects/983966396927/secrets/jibhong-website-secret/versions/latest
+      env: 'BUILD_SECRET'
