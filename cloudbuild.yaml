@@ -6,20 +6,23 @@ steps:
       - |
         docker build \
           --build-arg BUILD_SECRET="$$BUILD_SECRET" \
-          -t gcr.io/$PROJECT_ID/jibhong-website \
+          -t asia-southeast3-docker.pkg.dev/$PROJECT_ID/portfolio-website/jibhong-website:$COMMIT_SHA \
           .
     secretEnv: ['BUILD_SECRET']
 
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/jibhong-website']
+    args:
+      - 'push'
+      - 'asia-southeast3-docker.pkg.dev/$PROJECT_ID/portfolio-website/jibhong-website:$COMMIT_SHA'
 
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     args:
       - 'run'
-      - 'deploy'
-      - 'jibhong-website'
-      - '--image=gcr.io/$PROJECT_ID/jibhong-website'
-      - '--region=asia-southeast1'
+      - 'services'
+      - 'update'
+      - 'jibhong-portfolio-website'
+      - '--image=asia-southeast3-docker.pkg.dev/$PROJECT_ID/portfolio-website/jibhong-website:$COMMIT_SHA'
+      - '--region=asia-southeast3'
 
 availableSecrets:
   secretManager:
