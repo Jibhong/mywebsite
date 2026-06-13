@@ -2,13 +2,12 @@ import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
 import { dbSetOtp } from "@/lib/server/server.firestoreInterface";
-import { env } from "@/lib/server/env";
 
 export async function POST(req: Request) {
   
   const { email, password } = await req.json();
   // Only allow the configured admin email & password
-  if (email !== env.EMAIL || password !== env.PASSWORD) {
+  if (email !== process.env.EMAIL || password !== process.env.PASSWORD) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
 
@@ -17,19 +16,19 @@ export async function POST(req: Request) {
   console.log("OTP:", otp);
   // Configure mailer
   const transporter = nodemailer.createTransport({
-    host: env.SMTP_HOST,
-    port: Number(env.SMTP_PORT),
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT),
     secure: true,
     auth: {
-      user: env.SMTP_USER,
-      pass: env.SMTP_PASS,
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
     },
   });
 
   // Send OTP email
   await transporter.sendMail({
-    from: `"Admin Login" <${env.SMTP_USER}>`,
-    to: env.EMAIL,
+    from: `"Admin Login" <${process.env.SMTP_USER}>`,
+    to: process.env.EMAIL,
     subject: "Your OTP Code",
     text: `Your OTP is ${otp}`,
   });

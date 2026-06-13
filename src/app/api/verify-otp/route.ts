@@ -2,14 +2,13 @@ import { NextResponse } from "next/server";
 import { serialize } from "cookie";
 import jwt from 'jsonwebtoken';
 import { dbCheckOtp } from "@/lib/server/server.firestoreInterface";
-import { env } from "@/lib/server/env";
 
 export async function POST(req: Request) {
 
   const { challengeId, otp } = await req.json();
   if (await dbCheckOtp(challengeId, otp)) {
-    const email = env.EMAIL;
-    const jwtSecret = env.JWT_SECRET;
+    const email = process.env.EMAIL;
+    const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret || !email) return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     const token = jwt.sign({ email }, jwtSecret, { expiresIn: '1d' });
     const cookie = serialize("session", token, {
