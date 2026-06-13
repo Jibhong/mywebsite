@@ -4,7 +4,7 @@ steps:
     args:
       - '-c'
       - |
-        echo "=== cloudbuild.yaml is being used ==="
+        echo "=== cloudbuild.yaml inside repo is being used ==="
         echo "PROJECT_ID: $PROJECT_ID"
         echo "BUILD_SECRET length: $${#BUILD_SECRET}"
     secretEnv: ['BUILD_SECRET']
