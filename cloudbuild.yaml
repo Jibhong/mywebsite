@@ -36,6 +36,7 @@ steps:
       - 'asia-southeast3-docker.pkg.dev/$PROJECT_ID/portfolio-website/jibhong-website:$COMMIT_SHA'
 
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
     args:
       - 'run'
       - 'services'
@@ -43,7 +44,7 @@ steps:
       - 'jibhong-portfolio-website'
       - '--image=asia-southeast3-docker.pkg.dev/$PROJECT_ID/portfolio-website/jibhong-website:$COMMIT_SHA'
       - '--region=asia-southeast3'
-
+      
 availableSecrets:
   secretManager:
     - versionName: projects/983966396927/secrets/jibhong-website-secret/versions/latest
