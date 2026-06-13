@@ -12,9 +12,6 @@ FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Overwrite the empty .env with the real one injected by Cloud Build
-COPY .env .env
-
 RUN npm run build
 
 # --- STAGE 4: Production runner ---
@@ -33,9 +30,6 @@ RUN chown nextjs:nodejs .next
 
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-# Carry the real .env into the runner so server-side vars work at runtime
-COPY --from=builder --chown=nextjs:nodejs /app/.env .env
 
 USER nextjs
 
