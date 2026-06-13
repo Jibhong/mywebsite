@@ -1,16 +1,50 @@
-- name: 'gcr.io/cloud-builders/docker'
-  entrypoint: 'bash'
-  args:
-    - '-c'
-    - |
-      if [ -n "$$BUILD_SECRET" ]; then
-        echo "BUILD_SECRET length: ${#BUILD_SECRET}"
-      else
-        echo "BUILD_SECRET is not set or empty"
-      fi
+options:
+  logging: CLOUD_LOGGING_ONLY
 
-      docker build \
-        --build-arg BUILD_SECRET="$$BUILD_SECRET" \
-        -t asia-southeast3-docker.pkg.dev/$PROJECT_ID/portfolio-website/jibhong-website:$COMMIT_SHA \
-        .
-  secretEnv: ['BUILD_SECRET']
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        if [ -n "$$BUILD_SECRET" ]; then
+          echo "BUILD_SECRET length: ${#BUILD_SECRET}"
+        else
+          echo "BUILD_SECRET is not set or empty"
+        fi
+
+        docker build \
+          --build-arg BUILD_SECRET="$$BUILD_SECRET" \
+          -t asia-southeast3-docker.pkg.dev/$PROJECT_ID/portfolio-website/jibhong-website:$COMMIT_SHA \
+          .
+    secretEnv: ['BUILD_SECRET']
+    
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        docker build \
+          --build-arg BUILD_SECRET="$$BUILD_SECRET" \
+          -t asia-southeast3-docker.pkg.dev/$PROJECT_ID/portfolio-website/jibhong-website:$COMMIT_SHA \
+          .
+    secretEnv: ['BUILD_SECRET']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'asia-southeast3-docker.pkg.dev/$PROJECT_ID/portfolio-website/jibhong-website:$COMMIT_SHA'
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    args:
+      - 'run'
+      - 'services'
+      - 'update'
+      - 'jibhong-portfolio-website'
+      - '--image=asia-southeast3-docker.pkg.dev/$PROJECT_ID/portfolio-website/jibhong-website:$COMMIT_SHA'
+      - '--region=asia-southeast3'
+
+availableSecrets:
+  secretManager:
+    - versionName: projects/983966396927/secrets/jibhong-website-secret/versions/latest
+      env: 'BUILD_SECRET'
