@@ -15,7 +15,7 @@ steps:
 
         docker build \
           --build-arg BUILD_SECRET="$$BUILD_SECRET" \
-          -t asia-southeast3-docker.pkg.dev/$PROJECT_ID/portfolio-website/jibhong-website:$COMMIT_SHA \
+          -t asia-southeast1-docker.pkg.dev/$PROJECT_ID/portfolio-website-registry/jibhong-website:$COMMIT_SHA \
           .
     secretEnv: ['BUILD_SECRET']
     
@@ -26,25 +26,32 @@ steps:
       - |
         docker build \
           --build-arg BUILD_SECRET="$$BUILD_SECRET" \
-          -t asia-southeast3-docker.pkg.dev/$PROJECT_ID/portfolio-website/jibhong-website:$COMMIT_SHA \
+          -t asia-southeast1-docker.pkg.dev/$PROJECT_ID/portfolio-website-registry/jibhong-website:$COMMIT_SHA \
           .
     secretEnv: ['BUILD_SECRET']
 
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
-      - 'asia-southeast3-docker.pkg.dev/$PROJECT_ID/portfolio-website/jibhong-website:$COMMIT_SHA'
+      - 'asia-southeast1-docker.pkg.dev/$PROJECT_ID/portfolio-website-registry/jibhong-website:$COMMIT_SHA'
 
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: 'gcloud'
+    entrypoint: 'bash'
     args:
-      - 'run'
-      - 'services'
-      - 'update'
-      - 'jibhong-portfolio-website'
-      - '--image=asia-southeast3-docker.pkg.dev/$PROJECT_ID/portfolio-website/jibhong-website:$COMMIT_SHA'
-      - '--region=asia-southeast3'
-      
+      - '-c'
+      - |
+        if [ "$BRANCH_NAME" == "main" ]; then
+          echo "Branch is $BRANCH_NAME. Deploying to PRODUCTION..."
+          gcloud run deploy jibhong-portfolio-website \
+            --image=asia-southeast1-docker.pkg.dev/$PROJECT_ID/portfolio-website-registry/jibhong-website:$COMMIT_SHA \
+            --region=asia-southeast1
+        else
+          echo "Branch is $BRANCH_NAME. Deploying to STAGING..."
+          gcloud run deploy jibhong-portfolio-staging \
+            --image=asia-southeast1-docker.pkg.dev/$PROJECT_ID/portfolio-website-registry/jibhong-website:$COMMIT_SHA \
+            --region=asia-southeast1
+        fi
+
 availableSecrets:
   secretManager:
     - versionName: projects/983966396927/secrets/jibhong-website-secret/versions/latest
