@@ -4,6 +4,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: 'standalone',
   reactStrictMode: false,
+  serverExternalPackages: ['firebase-admin'],
 
   images: {
 
