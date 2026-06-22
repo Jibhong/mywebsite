@@ -9,6 +9,8 @@ import { getBlogUrl } from "@/lib/client/client.blogURLPhraser";
 import { singletonFirestorePublic } from "@/lib/client/singleton/client.firebasePublic";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 
+import { FaGithub, FaLinkedin } from "react-icons/fa";
+
 
 interface Card {
   title: string;
@@ -128,14 +130,17 @@ export default function Home() {
           <div className="mt-6 flex space-x-4">
             <a
               href="https://github.com/Jibhong"
-              className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition"
+              className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition"
             >
+              <FaGithub size={18} />
               GitHub
             </a>
+
             <a
               href="https://www.linkedin.com/in/Jibhong/"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition"
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition"
             >
+              <FaLinkedin size={18} />
               LinkedIn
             </a>
           </div>

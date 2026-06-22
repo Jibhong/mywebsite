@@ -55,7 +55,7 @@ export function Footer() {
         <div className="flex space-x-4 mt-2 sm:mt-0">
           <a href="https://github.com/Jibhong" className="hover:text-gray-300 transition">GitHub</a>
           <a href="https://linkedin.com/in/Jibhong" className="hover:text-gray-300 transition">LinkedIn</a>
-          <a href="mailto:jibhongsup@gmail.com" className="hover:text-gray-300 transition">Email</a>
+          <a href="mailto:pisitjibhong@gmail.com" className="hover:text-gray-300 transition">Email</a>
         </div>
       </div>
     </footer>
