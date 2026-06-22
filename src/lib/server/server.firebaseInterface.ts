@@ -3,6 +3,8 @@ import { getStorage } from "firebase-admin/storage";
 import { Bucket } from "@google-cloud/storage";
 import { getFirestore, Firestore } from "firebase-admin/firestore";
 
+import https from "https";
+
 let bucket: Bucket;
 let firestore: Firestore;
 
@@ -10,6 +12,9 @@ let firestore: Firestore;
 export function initFirebase() {
   if (!getApps().length) {
     console.log("Login to firebase service account");
+    
+    // Workaround for Node.js 24.17.0 regression causing ERR_STREAM_PREMATURE_CLOSE in gaxios/node-fetch
+    https.globalAgent.keepAlive = false;
 
     const projectId = process.env.FIREBASE_PROJECT_ID;
     const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
