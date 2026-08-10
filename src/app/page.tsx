@@ -124,7 +124,7 @@ export default function Home() {
           </div>
 
           <p className="mt-4 text-center text-gray-700 max-w-xl text-lg sm:text-xl">
-            {"Test"}
+            {"Hello 67"}
           </p>
 
           <div className="mt-6 flex space-x-4">
