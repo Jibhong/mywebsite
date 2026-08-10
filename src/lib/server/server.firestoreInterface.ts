@@ -113,7 +113,7 @@ async function setBlogFolderPublished(path: string, isPublished: boolean) {
       files.map(async (file) => {
         await file.setMetadata({
           metadata: {
-            visibility: null
+            visibility: ""  // empty string removes the key; null is rejected by GCS API
           }
         });
       })

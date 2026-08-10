@@ -42,8 +42,8 @@ export async function POST(req: NextRequest) {
   const snapData = snap.data()
   if (!snapData) return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
 
-  console.log(`visibility: ${snapData.isPublished ? "public" : null}`)
-  const newMetadata = { visibility: snapData.isPublished ? "public" : null };
+  console.log(`visibility: ${snapData.isPublished ? "public" : ""}`)
+  const newMetadata = { visibility: snapData.isPublished ? "public" : "" };  // empty string removes the key; null is rejected by GCS API
 
 
   if (reqPreviewImage) {
