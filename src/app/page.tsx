@@ -106,7 +106,7 @@ export default function Home() {
         <Header />
 
         <div className=" px-10 flex flex-col items-center mb-16">
-          <div className="w-40 h-40 relative rounded-full overflow-hidden border-4 border-white shadow-lg">
+          <div className="group w-40 h-40 relative rounded-full overflow-hidden border border-gray-300 hover:animate-spin hover-mask-circle-center">
             <Image
               src="/profile.webp"
               alt="User Profile"
@@ -114,6 +114,7 @@ export default function Home() {
               className="object-cover"
             />
           </div>
+
 
           <div className="mt-8 text-2xl sm:text-3xl font-bold text-gray-600 text-center">
             {"Hello, I'm"}
@@ -168,6 +169,19 @@ export default function Home() {
                     // unoptimized
                     alt="Blog Preview Image"
                     src={data?.thumbnail ?? "/loading.gif"}
+                    onError={() => {
+                      setCards((prevCards) =>
+                        prevCards.map((card, i) => {
+                          if (i === index && card !== null) {
+                            return {
+                              ...card,
+                              thumbnail: "/loading.gif",
+                            };
+                          }
+                          return card;
+                        })
+                      )
+                    }}
                     width={400}
                     height={400}
                     className="w-30 h-30 xl:w-40 xl:h-40 object-cover rounded-2xl justify-self-end"

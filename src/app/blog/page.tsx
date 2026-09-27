@@ -154,6 +154,19 @@ function HomeContent() {
 
                     <Image
                       src={data?.thumbnail ?? "/loading.gif"}
+                      onError={() => {
+                      setCards((prevCards) =>
+                        prevCards.map((card, i) => {
+                          if (i === index && card !== null) {
+                            return {
+                              ...card,
+                              thumbnail: "/loading.gif",
+                            };
+                          }
+                          return card;
+                        })
+                      )
+                    }}
                       alt="Repo image"
                       width={400}
                       height={400}
