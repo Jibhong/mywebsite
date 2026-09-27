@@ -61,8 +61,14 @@ const MarkdownImage: React.FC<RMImgProps> = ({ src, alt, width, height, ...imgPr
 
 MarkdownImage.displayName = "MarkdownImage";
 
-const VIDEO_EXTENSIONS = /\.(mp4|webm|ogg|mov)$/i;
-
+const isVideoUrl = (src: string) => {
+  try {
+    const pathname = new URL(src).pathname;
+    return /\.(mp4|webm|ogg|mov)$/i.test(pathname);
+  } catch {
+    return /\.(mp4|webm|ogg|mov)(\?|$)/i.test(src);
+  }
+};
 const components: Components = {
   h1: ({ children }) => (
     <h1 className="text-4xl font-extrabold text-gray-900 mb-6">
@@ -152,7 +158,7 @@ const components: Components = {
   ),
 
   img: ({ src, alt }) => {
-    if (typeof src === "string" && VIDEO_EXTENSIONS.test(src)) {
+    if (typeof src === "string" && isVideoUrl(src)) {
       return (
         <video
           src={src}
