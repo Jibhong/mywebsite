@@ -61,6 +61,8 @@ const MarkdownImage: React.FC<RMImgProps> = ({ src, alt, width, height, ...imgPr
 
 MarkdownImage.displayName = "MarkdownImage";
 
+const VIDEO_EXTENSIONS = /\.(mp4|webm|ogg|mov)$/i;
+
 const components: Components = {
   h1: ({ children }) => (
     <h1 className="text-4xl font-extrabold text-gray-900 mb-6">
@@ -149,7 +151,20 @@ const components: Components = {
     </pre>
   ),
 
-  img: MarkdownImage,
+  img: ({ src, alt }) => {
+    if (typeof src === "string" && VIDEO_EXTENSIONS.test(src)) {
+      return (
+        <video
+          src={src}
+          controls
+          className="w-full rounded-lg my-6"
+        >
+          Your browser does not support the video tag.
+        </video>
+      );
+    }
+    return <MarkdownImage src={src} alt={alt} />;
+  },
 
   hr: () => (
     <hr className="my-8 border-t border-gray-300" />
