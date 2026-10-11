@@ -10,56 +10,83 @@ type Props = {
   markdown: string;
 };
 
-type RMImgProps = React.ComponentPropsWithoutRef<"img">;
+type MediaProps = {
+  src?: string;
+  alt?: string;
+  width?: string | number;
+  height?: string | number;
+  kind: "image" | "video";
+};
 
-const MarkdownImage: React.FC<RMImgProps> = ({ src, alt, width, height, ...imgProps }) => {
+const parseDim = (v: string | number | undefined, fallback: number) => {
+  if (typeof v === "number") return v;
+  if (typeof v === "string") {
+    const n = parseInt(v, 10);
+    return Number.isNaN(n) ? fallback : n;
+  }
+  return fallback;
+};
+
+const MarkdownMedia: React.FC<MediaProps> = ({ src, alt, width, height, kind }) => {
   const [isFetching, setIsFetching] = React.useState(true);
 
-  // Turn width/height from string|number|undefined into a strict number
-  const parseDim = (v: string | number | undefined, fallback: number) => {
-    if (typeof v === "number") return v;
-    if (typeof v === "string") {
-      const n = parseInt(v, 10);
-      return Number.isNaN(n) ? fallback : n;
-    }
-    return fallback;
-  };
+  if (!src) return null;
 
-  // defaults if not provided by markdown
   const w = parseDim(width, 800);
   const h = parseDim(height, 450);
+  const done = () => setIsFetching(false);
 
-  if (!src) return null; // defensive
+  // no w-full: media keeps its natural size, capped by width and 80vh.
+  // The aspect ratio is preserved, so the frame wraps what is actually drawn.
+  const mediaClass =
+    "block h-auto w-auto max-w-full max-h-[80vh] transition-opacity duration-500 " +
+    (isFetching ? "opacity-0 absolute inset-0" : "opacity-100 relative");
 
   return (
-    <span className="relative block w-full" {...(imgProps)}>
+    <span className="relative block w-full my-6">
       {isFetching && (
         <span
           className="block rounded-lg w-full bg-gray-300 animate-pulse"
           style={{ paddingTop: `${(h / w) * 100}%` }}
         />
       )}
-      <span className="rounded-lg overflow-hidden relative max-h-[80vh] flex justify-center items-center">
-      <Image
-        src={String(src)}
-        alt={alt ?? ""}
-        width={w}
-        height={h}
-        sizes="(max-width: 768px) 100vw, 800px"
-        loading="lazy"
-        onLoad={() => setIsFetching(false)}
-        onError={() => setIsFetching(false)}
+      {/* frame: shrink-wraps the media, clips corners, centered */}
+      <span
         className={
-          `rounded-lg object-contain h-auto max-w-full w-full mx-auto max-h-[80vh] transition-opacity duration-500 ` +
-          (isFetching ? "opacity-0 absolute" : "opacity-100 relative")
+          "relative mx-auto block w-fit max-w-full overflow-hidden rounded-lg " +
+          (isFetching ? "absolute inset-0" : "")
         }
-      />
+      >
+        {kind === "video" ? (
+          <video
+            src={src}
+            controls
+            preload="metadata"
+            width={w}
+            height={h}
+            onLoadedMetadata={done}
+            onError={done}
+            className={mediaClass}
+          />
+        ) : (
+          <Image
+            src={src}
+            alt={alt ?? ""}
+            width={w}
+            height={h}
+            sizes="(max-width: 768px) 100vw, 800px"
+            loading="lazy"
+            onLoad={done}
+            onError={done}
+            className={mediaClass}
+          />
+        )}
       </span>
     </span>
   );
 };
 
-MarkdownImage.displayName = "MarkdownImage";
+MarkdownMedia.displayName = "MarkdownMedia";
 
 const isVideoUrl = (src: string) => {
   try {
@@ -157,20 +184,15 @@ const components: Components = {
     </pre>
   ),
 
-  img: ({ src, alt }) => {
-    if (typeof src === "string" && isVideoUrl(src)) {
-      return (
-        <video
-          src={src}
-          controls
-          className="w-full rounded-lg my-6"
-        >
-          Your browser does not support the video tag.
-        </video>
-      );
-    }
-    return <MarkdownImage src={src} alt={alt} />;
-  },
+  img: ({ src, alt, width, height }) => (
+    <MarkdownMedia
+      src={typeof src === "string" ? src : undefined}
+      alt={alt}
+      width={width}
+      height={height}
+      kind={typeof src === "string" && isVideoUrl(src) ? "video" : "image"}
+    />
+  ),
 
   hr: () => (
     <hr className="my-8 border-t border-gray-300" />
