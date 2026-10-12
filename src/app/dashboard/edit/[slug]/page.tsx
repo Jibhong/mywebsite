@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { useRef } from "react";
 
 
+import { FaLink } from "react-icons/fa";
 
 import { Header, Footer } from "@/lib/client/components/elements";
 import Image from "next/image";
@@ -14,13 +15,15 @@ import { useEffect, useState } from "react";
 import { HeaderDashboard } from "@/lib/client/components/dashboard.element";
 import MarkdownComponent from "@/lib/client/components/markdown";
 
+
 // Firebase stuffs
 import { singletonFirebaseStorage, singletonFirestore } from "@/lib/client/singleton/client.firebaseAuth";
 import { ref, list, getDownloadURL } from "firebase/storage";
 import React from "react";
 import { doc, getDoc } from "firebase/firestore";
+
 import { metadata } from "@/app/layout";
-import { FileManager } from "@/lib/client/components/dashboard.edit.element";
+import { FileManager, UrlAliasManager } from "@/lib/client/components/dashboard.edit.element";
 
 export default function Home({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = React.use(params);
@@ -186,8 +189,6 @@ export default function Home({ params }: { params: Promise<{ slug: string }> }) 
   useEffect(() => {
     async function loadContent() {
       const blogDataUrlPair = await fetchBlogData();
-      console.log(SLUG)
-      console.log(blogDataUrlPair)
 
       const found_markdown = blogDataUrlPair.find(file => file.name === "content.md");
       let res_markdown = null;
@@ -274,37 +275,31 @@ export default function Home({ params }: { params: Promise<{ slug: string }> }) 
     await loadPublicationStatus();
   }
 
-  async function buttonFileManager() {
-    setRenderMode("fileManager")
-  }
-
   return (
     <div className="pt-30 font-sans bg-orange-50 min-h-screen flex flex-col">
       <HeaderDashboard />
       <main className="flex-1 flex-col max-w-auto mx-4">
         {/* button tab */}
-        <div className="relative mb-4 max-w-3xl mx-auto justify-between border rounded-2xl border-gray-400 py-2 px-2">
+        <div className="relative mb-4 max-w-3xl mx-auto flex items-center border rounded-2xl border-gray-400 py-2 px-2">
           <button
             onClick={() => setRenderMode("preview")}
-            className={`px-2 py-2 rounded-lg transition ${renderMode == "preview" ? "bg-orange-300" : " hover:cursor-pointer"}`}
+            className={`flex items-center justify-center w-[41px] h-[41px] rounded-lg transition ${renderMode == "preview" ? "bg-orange-300" : "hover:cursor-pointer"}`}
           >
-            <Image
-              src="/icon/text-box-edit-outline.svg"
-              alt="fileManagerButton"
-              width={25}
-              height={25}
-            />
+            <Image src="/icon/text-box-edit-outline.svg" alt="previewButton" width={25} height={25} />
           </button>
+
           <button
-            onClick={() => buttonFileManager()}
-            className={`px-2 py-2 rounded-lg transition ${renderMode == "fileManager" ? "bg-orange-300" : " hover:cursor-pointer"}`}
+            onClick={() => setRenderMode("fileManager")}
+            className={`flex items-center justify-center w-[41px] h-[41px] rounded-lg transition ${renderMode == "fileManager" ? "bg-orange-300" : "hover:cursor-pointer"}`}
           >
-            <Image
-              src="/icon/folder-outline.svg"
-              alt="fileManagerButton"
-              width={25}
-              height={25}
-            />
+            <Image src="/icon/folder-outline.svg" alt="fileManagerButton" width={25} height={25} />
+          </button>
+
+          <button
+            onClick={() => setRenderMode("urlAliasManager")}
+            className={`flex items-center justify-center w-[41px] h-[41px] rounded-lg transition ${renderMode == "urlAliasManager" ? "bg-orange-300" : "hover:cursor-pointer"}`}
+          >
+            <FaLink size={18} />
           </button>
         </div>
 
@@ -447,6 +442,10 @@ export default function Home({ params }: { params: Promise<{ slug: string }> }) 
 
         <div className={renderMode === "fileManager" ? "block" : "hidden"}>
           <FileManager blogId={SLUG} />
+        </div>
+
+        <div className={renderMode === "urlAliasManager" ? "block" : "hidden"}>
+          <UrlAliasManager blogId={SLUG} />
         </div>
 
       </main>

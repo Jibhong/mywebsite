@@ -1,83 +1,20 @@
-"use client";
+import Home from "./home";
+import { getFirestoreDB } from "@/lib/server/server.firebaseInterface";
 
+async function getBlogId(slug: string): Promise<string | null> {
+  const db = getFirestoreDB();
 
-import Markdown from "react-markdown";
-import { notFound, redirect } from "next/navigation";
-import Image from "next/image";
+  const direct = await db.collection("blog-index").doc(slug).get();
+  if (direct.exists && direct.data()!.isPublished) return direct.id;
 
+  const alias = await db.collection("blog-alias").doc(slug).get();
+  if (alias.exists && (await db.collection("blog-index").doc(alias.data()!.target).get()).data()!.isPublished) return alias.data()!.target as string;
 
-import { Header, Footer } from "@/lib/client/components/elements";
-import { useEffect, useState } from "react";
-import { getBlogUrl } from "@/lib/client/client.blogURLPhraser";
-import MarkdownComponent from "@/lib/client/components/markdown";
+  return null;
+}
 
-export default function Home({ params: promise_params }: { params: { slug: string } }) {
-  const [markdown, setMarkdown] = useState<string>("");
-  const [metadata, setMetadata] = useState<{ title: string; description: string; date: number }>({
-    title: "Loading...",
-    description: "",
-    date: 0,
-  });
-  const [formattedDateTime, setFormattedDateTime] = useState<string>("");
+export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
 
-  async function initPage() {
-    const params = await promise_params;
-
-    const res_markdown = await fetch(getBlogUrl(`/blog_page/${params.slug}/content.md`));
-    const res_metadata = await fetch(getBlogUrl(`/blog_page/${params.slug}/metadata.json`));
-
-    if (!res_markdown.ok || !res_metadata.ok) redirect("/blog");
-
-    setMarkdown(await res_markdown.text());
-    const res_metadata_json = await res_metadata.json();
-    setMetadata(res_metadata_json);
-
-    const metadata_timestamp = Number(res_metadata_json.date) * 1000; // convert to milliseconds
-    const metadata_date = new Date(metadata_timestamp);
-
-    const metadata_formattedDate = metadata_date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "2-digit",
-      year: "numeric",
-    });
-    const metadata_formattedTime = metadata_date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    }).replace(":", ".");
-
-    setFormattedDateTime(`${metadata_formattedDate} (${metadata_formattedTime})`);
-  }
-  useEffect(() => {
-    initPage();
-  }, []);
-  return (
-    <div className="pt-30 font-sans bg-orange-50 min-h-screen flex flex-col">
-      <Header />
-      {/* Container */}
-      <main className="flex-1 flex justify-center items-start">
-        <div className="container max-w-3xl mx-auto p-6 min-h-screen">
-
-          <div className="mb-15">
-            <div className="italic mb-5 text-sm justify-end flex space-x-4 text-gray-600 text-sm">
-              {formattedDateTime}
-            </div>
-            <h1 className="text-4xl font-extrabold text-gray-900 mb-4">
-              {metadata.title}
-            </h1>
-            <h2 className="text-lg  text-gray-900 mb-4">
-              {metadata.description}
-            </h2>
-            <hr className="my-4 border-t border-gray-600" />
-          </div>
-
-          <article className="mb-20 break-words text-red-500 prose prose-lg prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-800 prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 prose-code:bg-gray-200 prose-code:px-1 prose-code:rounded prose-blockquote:border-l-4 prose-blockquote:border-blue-400 prose-blockquote:bg-blue-50 prose-blockquote:p-4 prose-li:marker:text-purple-600">
-            <MarkdownComponent markdown={markdown} />
-          </article>
-        </div>
-      </main>
-
-      <Footer />
-    </div>
-  );
+  return <Home promiseBlogId={getBlogId(slug)} />;
 }

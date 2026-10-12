@@ -33,7 +33,8 @@ async function getFirebaseToken(uuid: string | null = null): Promise<TokenAndExp
   const token = await auth.createCustomToken(uuid, {
     permissions: [
       "firebase-storage-view-protected-blog",
-      "firestore-view-blog-index"
+      "firestore-view-blog-index",
+      "firestore-view-blog-alias"
     ],
     expiresAt: newExpiresTime,
   });

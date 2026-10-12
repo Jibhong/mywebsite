@@ -1,15 +1,14 @@
 "use client"
 import { isFirebaseLoginContext } from "@/app/dashboard/layout";
-import { singletonFirebaseStorage } from "@/lib/client/singleton/client.firebaseAuth";
+import { singletonFirebaseStorage, singletonFirestore } from "@/lib/client/singleton/client.firebaseAuth";
 import { getDownloadURL, list, ref } from "firebase/storage";
-import { getPlaceholderFallbackRouteParams } from "next/dist/server/request/fallback-params";
-import Link from "next/link";
 
 import { useContext, useEffect, useState } from "react";
 import Image from "next/image";
 import { toast, Toaster } from "sonner";
-import { upload } from "@vercel/blob/client";
 import { getBlogUrl } from "@/lib/client/client.blogURLPhraser";
+import { collection, getDocs, query, where } from "firebase/firestore";
+
 
 type FileManagerProp = {
     blogId: string;
@@ -175,108 +174,235 @@ export function FileManager({ blogId }: FileManagerProp) {
         toast.success("Copied URL");
     }
 
-    return (<div className="mb-20 justify-items-center max-w-6xl w-full mx-auto p-6 pt-0 gap-4">
-        <Toaster />
-        <div className="mb-4 flex w-full max-w-3xl mx-auto justify-between border rounded-2xl border-gray-400 py-0 px-1">
-            <div className="flex flex-1">
+    return (
+        <div className="mb-20 justify-items-center max-w-6xl w-full mx-auto p-6 pt-0 gap-4">
+            <Toaster />
+            <div className="mb-4 flex w-full max-w-3xl mx-auto justify-between border rounded-2xl border-gray-400 py-0 px-1">
+                <div className="flex flex-1">
+                    <button
+                        onClick={() => uploadFileSelectFile()}
+                        className={`px-2 py-2 rounded-lg transition hover:cursor-pointer`}
+                    >
+                        <Image
+                            src="/icon/file-upload-outline.svg"
+                            alt="fileManagerButton"
+                            width={25}
+                            height={25}
+                        />
+                    </button>
+                    <input
+                        type="text"
+                        value={uploadFileName}
+                        onChange={(e) => setUploadFileName(e.target.value)}
+                        placeholder="File Name"
+                        className="px-1 py-2 outline-none flex-1"
+                    />
+                </div>
                 <button
-                    onClick={() => uploadFileSelectFile()}
+                    onClick={() => uploadFileUpload()}
                     className={`px-2 py-2 rounded-lg transition hover:cursor-pointer`}
                 >
                     <Image
-                        src="/icon/file-upload-outline.svg"
+                        src="/icon/upload-outline.svg"
                         alt="fileManagerButton"
                         width={25}
                         height={25}
                     />
                 </button>
+            </div>
+
+            <div className="mb-8 w-full">
+                {cards.map((data, index) => data?.type != "image" && data != null ? (
+                    <div key={index} className="flex animate-card-in rounded-xl px-4 py-1 min-w-0 w-full my-2 bg-white shadow-lg hover:shadow-xl transition">
+                        <button
+                            type="button"
+                            onClick={async () => copyPublicUrl(data.name)}
+                            className="mr-6 truncate hover:cursor-pointer"
+                        >
+                            {data?.name}
+                        </button>
+                        <div className="absolute right-2">
+
+                            <button
+                                type="button"
+                                className="w-6 h-6 flex items-center justify-center hover:cursor-pointer"
+                                onClick={() => deleteFile(data.name)}
+                            >
+                                <Image
+                                    src={"/icon/delete-forever-outline.svg"}
+                                    alt="toggle"
+                                    width={24}
+                                    height={24}
+                                />
+                            </button>
+                        </div>
+
+                    </div>
+                ) : null)}
+            </div>
+
+            <div className="grid grid-flow-dense grid-cols-[repeat(auto-fit,minmax(200px,1fr))] justify-items-center w-full mx-auto gap-4">
+                {cards.map((data, index) => data?.type == "image" ? (
+
+                    <div key={index} className="group flex-col relative animate-card-in w-full overflow-hidden rounded-md shadow-lg bg-white hover:shadow-xl transition hover:cursor-pointer" style={{ aspectRatio: data?.aspectRatio ?? 1 }} >
+                        <Image
+                            onClick={async () => copyPublicUrl(data.name)}
+                            alt="File Name"
+                            src={data?.type == "image" ? data.url : "/loading.gif"}
+                            width={400}
+                            height={400}
+                            className="w-full h-full object-cover"
+                        />
+
+                        <div className="absolute right-2 top-2 bg-white rounded-sm">
+                            <button
+                                type="button"
+                                className="w-6 h-6 flex items-center justify-center hover:cursor-pointer"
+                                onClick={(e) => deleteFile(data.name)}
+                            >
+                                <Image
+                                    src={"/icon/delete-forever-outline.svg"}
+                                    alt="toggle"
+                                    width={24}
+                                    height={24}
+                                />
+                            </button>
+                        </div>
+                        <div className="absolute bottom-0 left-0 w-full bg-black/60 text-white px-2 py-1 text-sm truncate backdrop-blur-sm opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                            {data?.name}
+                        </div>
+                    </div>
+
+                ) : null)}
+
+            </div>
+        </div>
+    )
+}
+
+export function UrlAliasManager({ blogId }: FileManagerProp) {
+    const loggedInToFirebase = useContext(isFirebaseLoginContext);
+    const [aliases, setAliases] = useState<string[]>([]);
+    const [newAlias, setNewAlias] = useState("");
+    const [isBusy, setIsBusy] = useState(false);
+
+    async function fetchAlias() {
+        const q = query(collection(singletonFirestore, "blog-alias"), where("target", "==", blogId));
+        const snap = await getDocs(q);
+        setAliases(snap.docs.map((d) => d.id).sort());
+    }
+
+    useEffect(() => {
+        if (!loggedInToFirebase) return;
+        fetchAlias();
+    }, [loggedInToFirebase, blogId]);
+
+    async function addAlias() {
+        const blogAlias = newAlias.trim();
+        if (!blogAlias || isBusy) return;
+        if (blogAlias.includes("/") || blogAlias === "." || blogAlias === "..") {
+            toast.error("Invalid name");
+            return;
+        }
+
+        setIsBusy(true);
+        try {
+            const formData = new FormData();
+            formData.append("blogId", blogId);
+            formData.append("blogAlias", blogAlias);
+
+            const res = await fetch("/api/edit/upload", { method: "POST", body: formData });
+
+            if (res.status === 409) {
+                toast.error("Name already exists");
+                return;
+            }
+            if (!res.ok) {
+                toast.error("Failed to add");
+                return;
+            }
+
+            setNewAlias("");
+            toast.success("Added");
+            await fetchAlias();
+        } catch {
+            toast.error("Failed to add");
+        } finally {
+            setIsBusy(false);
+        }
+    }
+
+    async function deleteAlias(blogAlias: string) {
+        if (!window.confirm(`Delete "${blogAlias}" ?`)) return;
+        try {
+            const formData = new FormData();
+            formData.append("blogId", blogId);
+            formData.append("blogAlias", blogAlias);
+
+            const res = await fetch("/api/edit/delete", { method: "POST", body: formData });
+            if (!res.ok) {
+                toast.error("Failed to delete");
+                return;
+            }
+            await fetchAlias();
+        } catch {
+            toast.error("Failed to delete");
+        }
+    }
+
+    async function copyAliasUrl(alias: string) {
+        const aliasUrl = `${window.location.origin}/blog/${encodeURIComponent(alias)}`;
+        await navigator.clipboard.writeText(aliasUrl);
+        toast.success("Copied URL");
+    }
+    return (
+        <div className="mb-20 justify-items-center max-w-6xl w-full mx-auto p-6 pt-0 gap-4">
+            <Toaster />
+            <div className="mb-4 flex w-full max-w-3xl mx-auto justify-between border rounded-2xl border-gray-400 py-0 px-1">
                 <input
                     type="text"
-                    value={uploadFileName}
-                    onChange={(e) => setUploadFileName(e.target.value)}
-                    placeholder="File Name"
-                    className="px-1 py-2 outline-none flex-1"
+                    value={newAlias}
+                    onChange={(e) => setNewAlias(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && addAlias()}
+                    placeholder="New URL name"
+                    className="px-2 py-2 outline-none flex-1"
                 />
+                <button
+                    onClick={addAlias}
+                    disabled={isBusy || !newAlias.trim()}
+                    className="px-2 py-2 rounded-lg transition hover:cursor-pointer disabled:opacity-40"
+                >
+                    Add
+                </button>
             </div>
-            <button
-                onClick={() => uploadFileUpload()}
-                className={`px-2 py-2 rounded-lg transition hover:cursor-pointer`}
-            >
-                <Image
-                    src="/icon/upload-outline.svg"
-                    alt="fileManagerButton"
-                    width={25}
-                    height={25}
-                />
-            </button>
-        </div>
-
-        <div className="mb-8 w-full">
-
-            {cards.map((data, index) => data?.type != "image" && data != null ? (
-                <div key={index} className="flex animate-card-in rounded-xl px-4 py-1 min-w-0 w-full my-2 bg-white shadow-lg hover:shadow-xl transition">
-                    <button
-                        type="button"
-                        onClick={async () => copyPublicUrl(data.name)}
-                        className="mr-6 truncate hover:cursor-pointer"
-                    >
-                        {data?.name}
-                    </button>
-                    <div className="absolute right-2">
-
+            <div className="mb-8 w-full">
+                {aliases.map((name, index) => (
+                    <div key={index} className="flex animate-card-in rounded-xl px-4 py-1 min-w-0 w-full my-2 bg-white shadow-lg hover:shadow-xl transition">
                         <button
                             type="button"
-                            className="w-6 h-6 flex items-center justify-center hover:cursor-pointer"
-                            onClick={() => deleteFile(data.name)}
+                            onClick={async () => copyAliasUrl(name)}
+                            className="mr-6 truncate hover:cursor-pointer"
                         >
-                            <Image
-                                src={"/icon/delete-forever-outline.svg"}
-                                alt="toggle"
-                                width={24}
-                                height={24}
-                            />
+                            {name}
                         </button>
-                    </div>
+                        <div className="absolute right-2">
 
-                </div>
-            ) : null)}
+                            <button
+                                type="button"
+                                className="w-6 h-6 flex items-center justify-center hover:cursor-pointer"
+                                onClick={() => deleteAlias(name)}
+                            >
+                                <Image
+                                    src={"/icon/delete-forever-outline.svg"}
+                                    alt="toggle"
+                                    width={24}
+                                    height={24}
+                                />
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
         </div>
-
-        <div className="grid grid-flow-dense grid-cols-[repeat(auto-fit,minmax(200px,1fr))] justify-items-center w-full mx-auto gap-4">
-            {cards.map((data, index) => data?.type == "image" ? (
-
-                <div key={index} className="group flex-col relative animate-card-in w-full overflow-hidden rounded-md shadow-lg bg-white hover:shadow-xl transition hover:cursor-pointer" style={{ aspectRatio: data?.aspectRatio ?? 1 }} >
-                    <Image
-                        onClick={async () => copyPublicUrl(data.name)}
-                        alt="File Name"
-                        src={data?.type == "image" ? data.url : "/loading.gif"}
-                        width={400}
-                        height={400}
-                        className="w-full h-full object-cover"
-                    />
-
-                    <div className="absolute right-2 top-2 bg-white rounded-sm">
-                        <button
-                            type="button"
-                            className="w-6 h-6 flex items-center justify-center hover:cursor-pointer"
-                            onClick={(e) => deleteFile(data.name)}
-                        >
-                            <Image
-                                src={"/icon/delete-forever-outline.svg"}
-                                alt="toggle"
-                                width={24}
-                                height={24}
-                            />
-                        </button>
-                    </div>
-                    <div className="absolute bottom-0 left-0 w-full bg-black/60 text-white px-2 py-1 text-sm truncate backdrop-blur-sm opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                        {data?.name}
-                    </div>
-                </div>
-
-            ) : null)}
-
-        </div>
-    </div>
-    )
+    );
 }

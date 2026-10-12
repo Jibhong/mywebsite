@@ -21,13 +21,15 @@ export async function POST(req: NextRequest) {
   if (!ok) return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
 
   const formData = await req.formData();
-
+  
+  const blogId = formData.get("blogId") as string | null;
   const reqPreviewImage = formData.get("previewImage") as File | null;
   const reqMarkdown = formData.get("markdown") as string | null;
   const reqMetadata = formData.get("metadata") as string | null;
-  const blogId = formData.get("blogId") as string | null;
-  const uploadFile = formData.get("uploadFile") as File | null;
-  const uploadFileName = formData.get("uploadFileName") as string | null;
+  const reqUploadFile = formData.get("uploadFile") as File | null;
+  const reqUploadFileName = formData.get("uploadFileName") as string | null;
+  const reqBlogAlias = formData.get("blogAlias") as string | null;
+
   if (!blogId) {
     return NextResponse.json({ error: "Invalid parameters" }, { status: 400 });
   }
@@ -38,7 +40,7 @@ export async function POST(req: NextRequest) {
   const dbBlogIndex = db.collection("blog-index");
   const docRef = dbBlogIndex.doc(blogId);
   const snap = await docRef.get();
-  if (!snap.exists) throw error("Blog to upload image not existed");
+  if (!snap.exists) throw error("Blog to upload not existed");
   const snapData = snap.data()
   if (!snapData) return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
 
@@ -105,12 +107,12 @@ export async function POST(req: NextRequest) {
       }
     });
   }
-  if (uploadFile && uploadFileName) {
-    const arrayBuffer = await uploadFile.arrayBuffer();
+  if (reqUploadFile && reqUploadFileName) {
+    const arrayBuffer = await reqUploadFile.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
     const firebaseFile = bucket.file(
-      `blog_page/${blogId}/file/${uploadFileName}`
+      `blog_page/${blogId}/file/${reqUploadFileName}`
     );
 
     await firebaseFile.save(buffer, {
@@ -119,6 +121,29 @@ export async function POST(req: NextRequest) {
       },
     });
   }
+  if (reqBlogAlias) {
+    const alias = reqBlogAlias.trim();
+    if (!alias || alias.includes("/") || alias === "." || alias === "..") {
+      return NextResponse.json({ error: "Invalid alias" }, { status: 400 });
+    }
+
+    const aliasRef = db.collection("blog-alias").doc(alias);
+    const indexRef = db.collection("blog-index").doc(alias);
+
+    try {
+      await db.runTransaction(async (tx) => {
+        const [a, i] = await Promise.all([tx.get(aliasRef), tx.get(indexRef)]);
+        if (a.exists || i.exists) throw new Error("EXISTS");
+        tx.create(aliasRef, { target: blogId });
+      });
+    } catch (e) {
+      if (e instanceof Error && e.message === "EXISTS") {
+        return NextResponse.json({ error: "Alias already exists" }, { status: 409 });
+      }
+      return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    }
+  }
+
   await docRef.update({
     version: Date.now()
   })
