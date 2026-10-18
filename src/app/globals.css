@@ -106,3 +106,30 @@ body {
 .animate-card-out {
   animation: cardOut 0.1s ease-in forwards;
 }
+
+
+/* Solas */
+.solas-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+.solas-scroll::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 8px 0; /* keeps the thumb away from the rounded corners */
+}
+.solas-scroll::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 9999px;
+}
+.solas-scroll::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* Firefox only (browsers that don't support ::-webkit-scrollbar) */
+@supports not selector(::-webkit-scrollbar) {
+  .solas-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
+  }
+}
