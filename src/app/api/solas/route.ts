@@ -47,7 +47,7 @@ async function getBlogs(): Promise<Blog[]> {
 
 let promptCache: string | null = null;
 let promptCacheAt = 0;
-const PROMPT_TTL = 5 * 60 * 0;
+const PROMPT_TTL = 5 * 60 * 1000;
 
 async function getSystemPrompt(): Promise<string | null> {
   try {
