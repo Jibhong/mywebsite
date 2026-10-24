@@ -12,7 +12,7 @@ export async function verifyTokenServer(token?: string | null) : Promise<boolean
   try {
     const secretKey = new TextEncoder().encode(secret);
 
-    const { payload } = await jwtVerify(token, secretKey);
+    const { payload } = await jwtVerify(token, secretKey, { algorithms: ["HS256"] });
 
     if (payload.email !== process.env.EMAIL || typeof payload.email !== "string") {
       return false;

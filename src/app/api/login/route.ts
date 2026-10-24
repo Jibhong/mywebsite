@@ -1,50 +1,56 @@
 import { NextResponse } from "next/server";
-import nodemailer from "nodemailer";
-import crypto from "crypto";
-import { dbSetOtp } from "@/lib/server/server.firestoreInterface";
+import { serialize } from "cookie";
+import { SignJWT } from "jose";
+import { getAuth, type DecodedIdToken } from "firebase-admin/auth";
+import { initFirebase } from "@/lib/server/server.firebaseInterface";
 
 export async function POST(req: Request) {
-  
-  const { email, password } = await req.json();
-  // Only allow the configured admin email & password
-  if (email !== process.env.EMAIL || password !== process.env.PASSWORD) {
-    return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+  let idToken: unknown;
+  try {
+    ({ idToken } = await req.json());
+  } catch {
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
-  // Generate OTP
-  const { otp, challengeId } = await generateOtp(email);
-  console.log("OTP:", otp);
-  // Configure mailer
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT),
-    secure: true,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
+  if (typeof idToken !== "string") {
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+  }
 
-  // Send OTP email
-  await transporter.sendMail({
-    from: `"Admin Login" <${process.env.SMTP_USER}>`,
-    to: process.env.EMAIL,
-    subject: "Your OTP Code",
-    text: `Your OTP is ${otp}`,
+  const email = process.env.EMAIL;
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!email || !jwtSecret) {
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+
+  initFirebase();
+
+  let decodedToken: DecodedIdToken;
+  try {
+    decodedToken = await getAuth().verifyIdToken(idToken);
+  } catch {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (decodedToken.email !== email || decodedToken.email_verified !== true) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const token = await new SignJWT({ email })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("1d")
+    .sign(new TextEncoder().encode(jwtSecret));
+
+  const cookie = serialize("session", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    path: "/",
+    maxAge: 60 * 60 * 24,
   });
 
   return NextResponse.json(
-    { message: "OTP sent", challengeId },
-    { status: 200 }
+    { message: "Sign in successfully" },
+    { status: 200, headers: { "Set-Cookie": cookie } },
   );
-}
-
-async function generateOtp(userId:string, digits = 6) {
-
-  const bytes = crypto.randomBytes(4).readUInt32BE() % (10 ** digits);
-  const otp = bytes.toString().padStart(digits, "0");
-  const challengeId: string = crypto.randomUUID();
-  await dbSetOtp(userId, challengeId, otp, Date.now() + 5 * 60 * 1000); // Expires in 5 minutes
-  return { otp, challengeId };
-
 }
