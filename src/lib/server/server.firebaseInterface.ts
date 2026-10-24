@@ -1,13 +1,11 @@
-import { initializeApp, getApps, cert } from "firebase-admin/app";
+import { initializeApp, getApps, cert, App } from "firebase-admin/app";
 import { getStorage } from "firebase-admin/storage";
 import { Bucket } from "@google-cloud/storage";
 import { getFirestore, Firestore } from "firebase-admin/firestore";
+import { initializeUI } from '@firebase-oss/ui-core';
+import { FirebaseUIProvider } from '@firebase-oss/ui-react';
 
-let bucket: Bucket;
-let firestore: Firestore;
-
-
-export function initFirebase() {
+export function initFirebase(): App | undefined {
   if (!getApps().length) {
     console.log("Login to firebase service account");
 
@@ -16,7 +14,7 @@ export function initFirebase() {
     const privateKey = process.env.FIREBASE_PRIVATE_KEY;
     const storageBucket = process.env.FIREBASE_STORAGE_BUCKET;
 
-    initializeApp({
+    return initializeApp({
       credential: cert({
         projectId,
         clientEmail,
@@ -29,18 +27,12 @@ export function initFirebase() {
   return;
 }
 
+export const  getFirebaseApp: App = getApps().length ? getApps()[0] : initFirebase() as App;
+
 export const getFirebaseStorageBucket = () => {
-  if (!bucket) {
-    initFirebase();
-    bucket = getStorage().bucket();
-  }
-  return bucket;
+  return getStorage().bucket();
 }
 
 export const getFirestoreDB = () => {
-  if (!firestore) {
-    initFirebase();
-    firestore = getFirestore("portfolio-website-firestore");
-  }
-  return firestore;
+  return getFirestore(getFirebaseApp, "portfolio-website-firestore");
 }

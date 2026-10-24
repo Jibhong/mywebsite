@@ -16,11 +16,11 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
-const app =
+export const singletonApp =
   getApps().length > 0
     ? getApps()[0]
     : initializeApp(firebaseConfig);
 
-export const singletonFirebaseAuth = getAuth(app);
-export const singletonFirebaseStorage = getStorage(app);
-export const singletonFirestore = getFirestore(app, "portfolio-website-firestore");
+export const singletonFirebaseAuth = getAuth(singletonApp);
+export const singletonFirebaseStorage = getStorage(singletonApp);
+export const singletonFirestore = getFirestore(singletonApp, "portfolio-website-firestore");

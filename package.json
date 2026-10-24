@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@firebase-oss/ui-react": "^7.0.3",
+    "@firebase-oss/ui-styles": "^7.1.0",
     "@vercel/blob": "^2.0.0",
     "cookie": "^1.0.2",
     "firebase": "^12.3.0",

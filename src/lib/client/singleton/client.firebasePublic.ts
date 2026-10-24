@@ -2,7 +2,6 @@
 
 import { getFirestore } from "firebase/firestore";
 import { initializeApp, getApps } from "firebase/app";
-import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 
 
@@ -16,10 +15,10 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
-const app =
+export const singletonApp =
   getApps().length > 0
     ? getApps()[0]
     : initializeApp(firebaseConfig);
 
-export const singletonFirebaseStoragePublic = getStorage(app);
-export const singletonFirestorePublic = getFirestore(app, "portfolio-website-firestore");
+export const singletonFirebaseStoragePublic = getStorage(singletonApp);
+export const singletonFirestorePublic = getFirestore(singletonApp, "portfolio-website-firestore");
