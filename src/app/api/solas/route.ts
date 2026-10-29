@@ -12,10 +12,10 @@ type InMsg = { role?: string; content?: string; message?: string };
 
 let blogCache: Blog[] | null = null;
 let blogCacheAt = 0;
-const BLOG_TTL = 5 * 60 * 1000;
+const BLOG_TTL = 1 * 60 * 1000;
 
 async function getBlogs(): Promise<Blog[]> {
-  if (blogCache && Date.now() - blogCacheAt < BLOG_TTL) return blogCache;
+  if (blogCache && Date.now() - blogCacheAt < BLOG_TTL &&  process.env.NODE_ENV == "production") return blogCache;
 
   const db = getFirestoreDB();
   const bucket = getFirebaseStorageBucket();
@@ -47,11 +47,11 @@ async function getBlogs(): Promise<Blog[]> {
 
 let promptCache: string | null = null;
 let promptCacheAt = 0;
-const PROMPT_TTL = 5 * 60 * 1000;
+const PROMPT_TTL = 1 * 60 * 1000;
 
 async function getSystemPrompt(): Promise<string | null> {
   try {
-    if (!promptCache || Date.now() - promptCacheAt >= PROMPT_TTL) {
+    if (!promptCache || Date.now() - promptCacheAt >= PROMPT_TTL ||  process.env.NODE_ENV !== "production") {
       const snap = await getFirestoreDB().collection("solas").doc("prompt").get();
       const text = snap.data()?.system;
       if (typeof text !== "string" || !text.trim()) {
@@ -75,11 +75,11 @@ async function getSystemPrompt(): Promise<string | null> {
 
 let fallbackCache: string[] | null = null;
 let fallbackCacheAt = 0;
-const FALLBACK_TTL = 5 * 60 * 1000;
+const FALLBACK_TTL = 1 * 60 * 1000;
 
 async function getFallback(): Promise<string | null> {
   try {
-    if (!fallbackCache || Date.now() - fallbackCacheAt >= FALLBACK_TTL) {
+    if (!fallbackCache || Date.now() - fallbackCacheAt >= FALLBACK_TTL ||  process.env.NODE_ENV !== "production") {
       const f = (await getFirestoreDB().collection("solas").doc("prompt").get()).data()?.fallback_response;
       fallbackCache = (Array.isArray(f) ? f : [f]).filter(
         (s): s is string => typeof s === "string" && s.trim() !== ""
@@ -155,7 +155,7 @@ export async function POST(req: Request) {
     console.error("last_query check failed:", e);
     return new Response("Internal server error", { status: 500 });
   }
-
+  console.log(system, userMsgs);
   const upstream = await fetch(`${LLAMA_URL}/v1/chat/completions`, {
     method: "POST",
     headers: {
@@ -168,8 +168,9 @@ export async function POST(req: Request) {
       tools,
       tool_choice: "auto",
       stream: true,
-      max_tokens: 250,
+      max_tokens: 100,
       chat_template_kwargs: { enable_thinking: false },
+      reasoning: { enabled: false },
     }),
     signal: req.signal,
     redirect: "manual",
