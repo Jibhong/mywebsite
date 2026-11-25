@@ -24,6 +24,7 @@ import { doc, getDoc } from "firebase/firestore";
 
 import { metadata } from "@/app/layout";
 import { FileManager, UrlAliasManager } from "@/lib/client/components/dashboard.edit.element";
+import "@/lib/client/components/card.css";
 
 export default function Home({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = React.use(params);

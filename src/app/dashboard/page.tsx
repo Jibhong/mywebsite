@@ -13,6 +13,7 @@ import { ref, list, getDownloadURL } from "firebase/storage";
 import { singletonFirebaseStorage, singletonFirestore } from "@/lib/client/singleton/client.firebaseAuth";
 import { isFirebaseLoginContext } from "./layout";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+import "@/lib/client/components/card.css";
 
 
 interface Card {

@@ -8,6 +8,7 @@ import Image from "next/image";
 import { toast, Toaster } from "sonner";
 import { getBlogUrl } from "@/lib/client/client.blogURLPhraser";
 import { collection, getDocs, query, where } from "firebase/firestore";
+import "./card.css";
 
 
 type FileManagerProp = {

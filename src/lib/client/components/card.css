@@ -1,0 +1,48 @@
+@reference "../../../app/globals.css";
+
+.card-background {
+  @apply bg-white rounded-2xl border-3 border-gray-100 p-6 hover:border-orange-300 transition
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+.animate-scroll {
+  display: inline-flex;
+  animation: scroll 30s linear infinite;
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-card-in {
+  animation: cardIn 0.1s ease-out forwards;
+}
+
+@keyframes cardOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+.animate-card-out {
+  animation: cardOut 0.1s ease-in forwards;
+}

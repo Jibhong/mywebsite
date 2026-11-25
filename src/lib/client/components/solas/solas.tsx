@@ -2,7 +2,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import atlas from "./atlas.json";
 import { useRouter } from "next/navigation";
-
+import "./solas.css";
 
 const size = 128;
 

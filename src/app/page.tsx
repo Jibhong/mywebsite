@@ -10,6 +10,8 @@ import { singletonFirestorePublic } from "@/lib/client/singleton/client.firebase
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 
 import { FaGithub, FaLinkedin } from "react-icons/fa";
+import "./page.css";
+import "@/lib/client/components/card.css";
 
 
 interface Card {

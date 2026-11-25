@@ -10,6 +10,7 @@ import { useSearchParams } from "next/navigation";
 import { getBlogUrl } from "@/lib/client/client.blogURLPhraser";
 import { singletonFirestorePublic } from "@/lib/client/singleton/client.firebasePublic";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+import "@/lib/client/components/card.css";
 
 
 
